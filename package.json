@@ -1,7 +1,7 @@
 {
   "name": "opsinote",
   "productName": "OpsiNote",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Notas, checklists e acompanhamento de alvos, estudos, projetos e tarefas.",
   "main": "./out/main/index.js",
   "author": "sacramentobernardes",
