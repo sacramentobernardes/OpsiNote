@@ -1,0 +1,35 @@
+# Também é o AppUserModelID do app no Windows (src/main/index.ts usa o mesmo). Era
+# app.opsinote.desktop: o Windows guardou para esse id o ícone do electron.exe (das execuções
+# em desenvolvimento), e o app instalado aparecia com o átomo na barra de tarefas.
+appId: app.opsinote.notes
+productName: OpsiNote
+directories:
+  buildResources: build
+  output: release
+files:
+  - out/**/*
+  - package.json
+win:
+  target: nsis
+  # Ícone com cada tamanho desenhado à mão (16 a 256 px), gerado de build/icon.svg.
+  icon: build/icon.ico
+  # Assinatura: o electron-builder assina sozinho quando estas variáveis de ambiente existem:
+  #   CSC_LINK          caminho (ou base64) do certificado .pfx
+  #   CSC_KEY_PASSWORD  senha do certificado
+  # Sem elas, o instalador sai sem assinatura e o Windows mostra o aviso do SmartScreen.
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+mac:
+  target: dmg
+  category: public.app-category.productivity
+linux:
+  target: AppImage
+  category: Office
+
+# Atualização automática: descomente e preencha para publicar versões no GitHub Releases.
+# O app instalado passa a buscar novas versões sozinho (veja "Atualizações" no README).
+# publish:
+#   provider: github
+#   owner: SEU-USUARIO
+#   repo: SEU-REPOSITORIO

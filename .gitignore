@@ -1,0 +1,28 @@
+# Dependências (recriadas com npm install)
+node_modules/
+
+# Builds
+out/
+dist/
+release/
+
+# Testes e relatórios
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Variáveis de ambiente e certificados (GH_TOKEN, CSC_LINK, CSC_KEY_PASSWORD…)
+.env
+.env.*
+*.pfx
+*.p12
+
+# Claude Code (skills e roteiros de teste ficam só neste computador)
+.claude/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
