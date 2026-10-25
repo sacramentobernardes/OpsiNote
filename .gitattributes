@@ -1,0 +1,10 @@
+# Quebra de linha LF em todos os arquivos de texto, no repositório e na pasta de trabalho
+# (inclusive no Windows). Evita o aviso "LF will be replaced by CRLF" e arquivos com as duas.
+* text=auto eol=lf
+
+# Imagens e ícones: binários, nunca convertidos.
+*.png binary
+*.ico binary
+*.jpg binary
+*.gif binary
+*.webp binary
