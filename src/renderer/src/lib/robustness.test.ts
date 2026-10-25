@@ -10,6 +10,7 @@ import { toCsv, toHtml, toMarkdown, toText } from './exportFormats'
 import { parseCsv, parseImportFile } from './importFormats'
 import { normalizeData } from './importData'
 import { KINDS } from './util'
+import { timeLimit } from './testing'
 
 /** Gerador pseudoaleatório simples (mulberry32): mesma semente, mesmos casos. */
 function rng(seed: number): () => number {
@@ -207,7 +208,7 @@ describe('desempenho com entradas patológicas', () => {
     } catch {
       // Só o tempo importa aqui.
     }
-    expect(performance.now() - start).toBeLessThan(3000)
+    expect(performance.now() - start).toBeLessThan(timeLimit(3000))
   })
 
   it('exporta e importa 5.000 itens em tempo razoável', () => {
@@ -217,7 +218,7 @@ describe('desempenho com entradas patológicas', () => {
       const r = parseImportFile(`x.${ext}`, render(data))
       expect(r.workspaces.reduce((n, b) => n + b.sections.reduce((m, s) => m + s.checklist.length + s.notes.length, 0), 0)).toBe(5000)
     }
-    expect(performance.now() - start).toBeLessThan(15000)
+    expect(performance.now() - start).toBeLessThan(timeLimit(15000))
   })
 })
 

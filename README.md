@@ -105,15 +105,20 @@ O app nunca busca imagens na internet: ao colar conteúdo de um site, as imagens
 
 Links nas notas abrem no navegador com `Ctrl+clique`.
 
-## Atualizações e assinatura
+## Releases e atualizações
 
-O app instalado procura atualizações sozinho, mas só depois que um local de publicação for configurado:
+As releases são montadas sozinhas pelo GitHub Actions (`.github/workflows/release.yml`). Para lançar uma versão:
 
-1. No `electron-builder.yml`, descomente o bloco `publish` e preencha o usuário e o repositório do GitHub.
-2. Gere um token do GitHub com permissão de escrita em Releases e defina a variável de ambiente `GH_TOKEN`.
-3. Aumente a versão no `package.json` e rode `npx electron-builder --win --publish always`.
+```bash
+npm version minor        # ou patch (correções) / major: muda o package.json, faz o commit e cria a tag
+git push --follow-tags   # envia o commit e a tag
+```
 
-Quando uma versão nova termina de baixar, o app mostra **Reiniciar e atualizar**. Se você não reiniciar, ela é instalada ao fechar o app.
+A tag `v*` enviada dispara o workflow, que confere se a tag bate com o `package.json`, roda o typecheck e os testes, gera o instalador do Windows e cria a release com as notas geradas a partir dos commits. Acompanhe em **Actions** no GitHub; se algo falhar, nada é publicado, e os arquivos gerados ficam para baixar na página da execução. Tags com hífen (`v0.2.0-beta.1`) viram pré-release.
+
+Cada release leva três arquivos: `OpsiNote-Setup-<versão>.exe` (o instalador), `latest.yml` e o `.blockmap` (usados pela atualização automática). O app instalado procura versões novas nas releases deste repositório (bloco `publish` do `electron-builder.yml`). Quando uma termina de baixar, ele mostra **Reiniciar e atualizar**; se você não reiniciar, ela é instalada ao fechar o app.
+
+Para gerar o instalador no seu computador, sem publicar: `npm run package:win` (sai em `release/`).
 
 ### Ícone
 

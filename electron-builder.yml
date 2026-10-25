@@ -20,6 +20,9 @@ win:
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
+  # Nome sem espaços: o GitHub troca espaços por pontos ao anexar o arquivo, e o latest.yml
+  # (que a atualização automática lê) apontaria para um nome que não existe na release.
+  artifactName: ${productName}-Setup-${version}.${ext}
 mac:
   target: dmg
   category: public.app-category.productivity
@@ -27,9 +30,11 @@ linux:
   target: AppImage
   category: Office
 
-# Atualização automática: descomente e preencha para publicar versões no GitHub Releases.
-# O app instalado passa a buscar novas versões sozinho (veja "Atualizações" no README).
-# publish:
-#   provider: github
-#   owner: SEU-USUARIO
-#   repo: SEU-REPOSITORIO
+# Atualização automática: o app instalado procura versões novas nas releases deste repositório.
+# Gravado dentro do instalador (resources/app-update.yml): precisa estar certo ANTES de gerar
+# a versão, ou quem a instalar não recebe as próximas. As releases são montadas pelo
+# .github/workflows/release.yml a cada tag v* enviada (veja "Releases" no README).
+publish:
+  provider: github
+  owner: sacramentobernardes
+  repo: OpsiNote

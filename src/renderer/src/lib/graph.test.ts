@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { buildGraph, neighbors, orphans } from './graph'
 import { createSimulation } from './graphLayout'
-import { board, entry, makeData, section } from './testing'
+import { board, entry, makeData, section, timeLimit } from './testing'
 import type { AppData } from '../types'
 
 function data(): AppData {
@@ -109,7 +109,7 @@ describe('createSimulation', () => {
     const sim = createSimulation(n, links)
     const start = performance.now()
     for (let i = 0; i < 30; i++) sim.step()
-    expect(performance.now() - start).toBeLessThan(3000)
+    expect(performance.now() - start).toBeLessThan(timeLimit(3000))
     expect([...sim.pos].every(Number.isFinite)).toBe(true)
   })
 })

@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { areLinked, buildGraph, mostConnected, neighborhood, neighbors, orphans, subgraph, whyNotLinkable, withMention, type Graph } from './graph'
 import { createSimulation } from './graphLayout'
-import { board, entry, section } from './testing'
+import { board, entry, section, timeLimit } from './testing'
 import type { AppData, Board } from '../types'
 
 function dataWith(workspaces: Board[], extra: Partial<AppData> = {}): AppData {
@@ -142,7 +142,7 @@ describe('buildGraph: casos-limite', () => {
     )
     const start = performance.now()
     const g = buildGraph(dataWith(boards))
-    expect(performance.now() - start).toBeLessThan(4000)
+    expect(performance.now() - start).toBeLessThan(timeLimit(4000))
     expect(g.nodes).toHaveLength(40 + 2000)
     expect(g.links.filter((l) => l.kind === 'mentions').length).toBeGreaterThan(2000)
   })

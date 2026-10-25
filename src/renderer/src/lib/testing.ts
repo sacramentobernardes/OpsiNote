@@ -43,3 +43,10 @@ export function makeData(): AppData {
     settings: { theme: 'system' }
   }
 }
+
+/**
+ * Limite de tempo dos testes de desempenho. No servidor de integração contínua (CI=true,
+ * como no GitHub Actions) as máquinas são mais lentas: o limite triplica, para uma release
+ * não ser bloqueada por um falso alarme. Um travamento de verdade estoura do mesmo jeito.
+ */
+export const timeLimit = (ms: number): number => ms * (process.env.CI ? 3 : 1)

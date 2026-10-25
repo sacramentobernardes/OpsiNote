@@ -1,0 +1,107 @@
+# Release automática: a cada tag v* enviada (ex.: v0.2.0), o GitHub testa o app, gera o
+# instalador do Windows e cria a release com os arquivos que a atualização automática usa.
+#
+# Para lançar uma versão:
+#   npm version minor          (ou patch / major: muda o package.json, faz o commit e cria a tag)
+#   git push --follow-tags
+# Acompanhe em github.com/sacramentobernardes/OpsiNote/actions.
+#
+# Tags com hífen (v0.2.0-beta.1) viram pré-release: quem tem o app instalado não recebe.
+
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+# Criar a release e anexar os arquivos.
+permissions:
+  contents: write
+
+# Duas tags enviadas juntas não disputam a mesma release.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Baixar o código da tag
+        uses: actions/checkout@v4
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # O electron-builder grava a versão do package.json no instalador e no latest.yml.
+      # Se a tag disser outra coisa, a atualização automática se perde: melhor parar aqui.
+      - name: Conferir se a tag bate com o package.json
+        shell: bash
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          pkg_version="$(node -p "require('./package.json').version")"
+          if [ "$tag_version" != "$pkg_version" ]; then
+            echo "::error::A tag $GITHUB_REF_NAME não bate com a versão $pkg_version do package.json. Crie a tag com 'npm version', que muda os dois juntos."
+            exit 1
+          fi
+
+      - name: Instalar as dependências
+        run: npm ci
+
+      - name: Verificar os tipos
+        run: npm run typecheck
+
+      - name: Rodar os testes
+        run: npm test
+
+      # --publish never (no script): quem cria a release é o passo seguinte.
+      - name: Gerar o instalador
+        run: npm run package:win
+
+      - name: Criar a release com o instalador
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          files=(
+            "release/OpsiNote-Setup-$version.exe"
+            "release/OpsiNote-Setup-$version.exe.blockmap"
+            "release/latest.yml"
+          )
+          for f in "${files[@]}"; do
+            [ -f "$f" ] || { echo "::error::Não encontrei $f. Os arquivos gerados foram:"; ls release; exit 1; }
+          done
+
+          prerelease=()
+          case "$version" in *-*) prerelease=(--prerelease) ;; esac
+
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            # A release já existe (por exemplo, criada à mão ou numa execução repetida):
+            # só troca os arquivos, sem mexer no título nem nas notas.
+            gh release upload "$GITHUB_REF_NAME" "${files[@]}" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "${files[@]}" \
+              --title "OpsiNote $version" \
+              --generate-notes \
+              --verify-tag \
+              "${prerelease[@]}"
+          fi
+
+      # Se algo der errado, os arquivos gerados ficam para baixar na página da execução.
+      - name: Guardar os arquivos gerados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: opsinote-windows
+          path: |
+            release/*.exe
+            release/*.blockmap
+            release/latest.yml
+          if-no-files-found: ignore
+          retention-days: 14
