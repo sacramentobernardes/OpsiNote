@@ -80,6 +80,12 @@ jobs:
             [ -f "$f" ] || { echo "::error::Não encontrei $f. Os arquivos gerados foram:"; ls release; exit 1; }
           done
 
+          # Cópia com nome fixo para o link de download direto do README
+          # (releases/latest/download/OpsiNote-Setup.exe). A atualização automática segue
+          # usando o arquivo com a versão no nome, que é o que o latest.yml aponta.
+          cp "release/OpsiNote-Setup-$version.exe" release/OpsiNote-Setup.exe
+          files+=("release/OpsiNote-Setup.exe")
+
           prerelease=()
           case "$version" in *-*) prerelease=(--prerelease) ;; esac
 

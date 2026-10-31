@@ -1,7 +1,7 @@
 # OpsiNote
 
 <p align="center">
-  <img src="build/icon.png" alt="Ícone do OpsiNote" width="128">
+  <img src="docs/screenshot.png" alt="Tela do OpsiNote: árvore do espaço à esquerda e uma nota aberta no editor" width="800">
 </p>
 
 Aplicativo desktop para organizar notas, checklists e acompanhamento de alvos de pentest, estudos, projetos e tarefas.
@@ -9,14 +9,14 @@ Aplicativo desktop para organizar notas, checklists e acompanhamento de alvos de
 <h2 align="center">Download</h2>
 
 <p align="center">
-  <a href="https://github.com/sacramentobernardes/OpsiNote/releases/latest"><img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0wIDMuNCA5LjggMnY5LjVIMHpNMTEgMS44IDI0IDB2MTEuNEgxMXpNMCAxMi42aDkuOFYyMkwwIDIwLjZ6TTExIDEyLjZoMTNWMjRsLTEzLTEuOHoiLz48L3N2Zz4%3D" alt="Baixar para Windows" height="40"></a>
+  <a href="https://github.com/sacramentobernardes/OpsiNote/releases/latest/download/OpsiNote-Setup.exe"><img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0wIDMuNCA5LjggMnY5LjVIMHpNMTEgMS44IDI0IDB2MTEuNEgxMXpNMCAxMi42aDkuOFYyMkwwIDIwLjZ6TTExIDEyLjZoMTNWMjRsLTEzLTEuOHoiLz48L3N2Zz4%3D" alt="Baixar para Windows" height="40"></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/sacramentobernardes/OpsiNote/releases/latest"><img src="https://img.shields.io/github/v/release/sacramentobernardes/OpsiNote?label=vers%C3%A3o&color=0078D6" alt="Versão mais recente"></a>
 </p>
 
-Baixe o `OpsiNote-Setup-<versão>.exe` em **Assets** na página da release. Depois de instalado, o app se atualiza sozinho.
+O botão baixa direto o instalador da versão mais recente (`OpsiNote-Setup.exe`). Depois de instalado, o app se atualiza sozinho.
 
 ## Conceitos
 
@@ -134,7 +134,7 @@ git push --follow-tags   # envia o commit e a tag
 
 A tag `v*` enviada dispara o workflow, que confere se a tag bate com o `package.json`, roda o typecheck e os testes, gera o instalador do Windows e cria a release com as notas geradas a partir dos commits. Acompanhe em **Actions** no GitHub; se algo falhar, nada é publicado, e os arquivos gerados ficam para baixar na página da execução. Tags com hífen (`v0.2.0-beta.1`) viram pré-release.
 
-Cada release leva três arquivos: `OpsiNote-Setup-<versão>.exe` (o instalador), `latest.yml` e o `.blockmap` (usados pela atualização automática). O app instalado procura versões novas nas releases deste repositório (bloco `publish` do `electron-builder.yml`). Quando uma termina de baixar, ele mostra **Reiniciar e atualizar**; se você não reiniciar, ela é instalada ao fechar o app.
+Cada release leva quatro arquivos: `OpsiNote-Setup-<versão>.exe` (o instalador), `latest.yml` e o `.blockmap` (usados pela atualização automática), e `OpsiNote-Setup.exe`, uma cópia do instalador com nome fixo para o botão de download do README (`releases/latest/download/OpsiNote-Setup.exe` sempre aponta para a versão mais recente). O app instalado procura versões novas nas releases deste repositório (bloco `publish` do `electron-builder.yml`). Quando uma termina de baixar, ele mostra **Reiniciar e atualizar**; se você não reiniciar, ela é instalada ao fechar o app.
 
 Para gerar o instalador no seu computador, sem publicar: `npm run package:win` (sai em `release/`).
 
