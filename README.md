@@ -4,78 +4,119 @@
   <img src="docs/screenshot.png" alt="Tela do OpsiNote: árvore do espaço à esquerda e uma nota aberta no editor" width="800">
 </p>
 
-Aplicativo desktop para organizar notas, checklists e acompanhamento de alvos de pentest, estudos, projetos e tarefas.
-
-<h2 align="center">Download</h2>
+<p align="center">
+  Notas, checklists e acompanhamento de <b>alvos de pentest</b>, <b>estudos</b>, <b>projetos</b> e <b>tarefas</b>, num app desktop que guarda tudo no seu computador.
+</p>
 
 <p align="center">
   <a href="https://github.com/sacramentobernardes/OpsiNote/releases/latest/download/OpsiNote-Setup.exe"><img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0wIDMuNCA5LjggMnY5LjVIMHpNMTEgMS44IDI0IDB2MTEuNEgxMXpNMCAxMi42aDkuOFYyMkwwIDIwLjZ6TTExIDEyLjZoMTNWMjRsLTEzLTEuOHoiLz48L3N2Zz4%3D" alt="Baixar para Windows" height="40"></a>
+  &nbsp;
+  <a href="docs/OpsiNote-Manual.pdf"><img src="https://img.shields.io/badge/Manual_completo-PDF-b45309?style=for-the-badge" alt="Manual completo em PDF" height="40"></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/sacramentobernardes/OpsiNote/releases/latest"><img src="https://img.shields.io/github/v/release/sacramentobernardes/OpsiNote?label=vers%C3%A3o&color=0078D6" alt="Versão mais recente"></a>
 </p>
 
-O botão baixa direto o instalador da versão mais recente (`OpsiNote-Setup.exe`). Depois de instalado, o app se atualiza sozinho.
+## Destaques
 
-## Conceitos
+- **Espaços com ficha**: cada alvo, matéria ou projeto tem seções com checklist, notas e uma ficha (IP, curso, repositório…).
+- **Snippets com variáveis**: `nmap -sV {{ip}}` sai pronto, com o IP do espaço aberto.
+- **Mapa mental** ligado ao espaço: o que muda num aparece no outro.
+- **Bibliotecas e modelos** para reaproveitar roteiros e estruturas de nota.
+- **Exporta e importa** JSON, HTML, Markdown, CSV e texto.
+- **Offline e privado**: dados locais, sem buscar imagens na internet.
 
-- **Espaços**: o que você está acompanhando (um alvo, uma matéria, um projeto, uma lista de tarefas). Cada espaço tem seções, e cada seção tem um checklist e notas.
-- **Bibliotecas**: checklists reutilizáveis. Crie um espaço a partir de uma biblioteca, ou salve um espaço como biblioteca.
-- **Modelos de nota**: estruturas prontas para novas notas (relatório de vulnerabilidade, resumo de estudo, ata).
-- **Snippets**: trechos de texto copiados com um clique. Podem ter variáveis, como `nmap -sV {{ip}}`, preenchidas ao copiar.
-  Também podem ser inseridos no texto: digite `s/` numa nota, item, modelo ou campo da ficha (ou use o botão de terminal) e escolha o snippet. Nas notas ele entra como bloco de código, com as variáveis já preenchidas pela ficha do espaço; nos modelos e nas bibliotecas as `{{variáveis}}` ficam como estão.
-- **Variáveis no texto**: digite `/` numa nota ou item (ou use o botão `{ }`) e escolha uma variável da ficha do espaço aberto. Ela aparece como uma etiqueta com o valor atual e acompanha a ficha: mudou o valor lá, muda em todas as notas. Nos modelos e bibliotecas aparece como `{{chave}}` e ganha o valor quando a nota estiver num espaço. Na exportação sai como `{{chave}}` (a ficha vai junto), e um Markdown importado com `{{chave}}` fora de código volta como variável.
-- **Ficha**: primeira linha da árvore de cada espaço, com campos conforme a categoria. Todas guardam as variáveis usadas nos snippets e um período. A seção **Snippets** da ficha lista todos os snippets já preenchidos com as variáveis dela, para copiar com um clique; uma variável que falta pode ser criada ali mesmo.
-  - *Pentest* → **Ficha do alvo**: alvo, IP, domínio, URL; engajamento, escopo e contatos.
-  - *Estudo* → **Ficha de estudo**: tema, curso; data da prova/meta, objetivo, materiais e rotina.
-  - *Projeto* → **Ficha do projeto**: repositório, URL; entrega, objetivo, links e pessoas.
-  - *Tarefas* e *Geral*: prazo e um campo de contexto/anotações.
+## Como usar
 
-  Ao trocar a categoria, os campos da anterior ficam guardados e voltam se você trocar de volta.
-- **Configurações** (engrenagem no trilho): tema, menu lateral, espaço usado pelos snippets, dados e backup, atalhos (personalizáveis), **Ajuda** com exemplos práticos de uso, e a versão do app.
-- **Lixeira**: o que você exclui vai para a lixeira, de onde pode ser restaurado por 30 dias. Logo depois de excluir, o aviso tem um botão **Desfazer**.
+O instalador baixa a versão mais recente, e depois o app **se atualiza sozinho**. Na primeira abertura, o espaço **Bem-vindo ao OpsiNote** é um tour guiado dentro do próprio app.
 
-Itens, notas, seções, snippets, modelos e espaços podem ser duplicados e movidos pelo menu **⋯** de cada linha. Clicar com o **botão direito** num espaço (no trilho ou no Início) ou numa biblioteca abre as ações dele: abrir, renomear, mudar a cor e a categoria, duplicar, salvar como biblioteca ou criar um espaço a partir dela, exportar só ele e excluir (pelo teclado: tecla de menu ou `Shift+F10`).
+> 📘 O passo a passo completo, com todos os recursos e exemplos, está no **[manual em PDF](docs/OpsiNote-Manual.pdf)**. Abaixo, um resumo. Clique para expandir.
 
-- **Fixados**: espaços, itens, notas e snippets podem ser fixados no topo (menu **⋯** ou botão direito → **Fixar no topo**). Eles aparecem primeiro nas listas e no trilho, na seção **Fixados** do Início e na busca antes de digitar. A ordem guardada não muda: desafixar devolve o item ao lugar.
-- **Mapa mental** (ícone no trilho, ou **Ver mapa mental** no menu de um espaço ou biblioteca): cada espaço tem o seu, com o espaço no centro, as seções nos ramos e as tarefas e notas nos tópicos. O mapa e o espaço andam juntos: criar um tópico embaixo da raiz cria uma seção; embaixo de uma seção, uma tarefa; embaixo de uma tarefa, um **subitem** dela, que aparece recuado embaixo dela na árvore do espaço. Subitens não são tarefas: não têm caixa de marcar e não contam no progresso. Tópicos soltos que já estavam embaixo de seções e tarefas (de mapas da versão anterior) viram itens do espaço ao abrir o mapa. Renomear, marcar, reordenar, mudar de ramo ou excluir (os itens vão para a lixeira) também muda o espaço, e o que muda no espaço aparece no mapa. Tópicos criados embaixo de um tópico solto ficam só no mapa.
-  - **Editar**: duplo clique (ou `F2`) muda o texto; `Tab` cria um filho, `Enter` um irmão, `Delete` exclui (com **Desfazer**), `Espaço` recolhe ou expande, as setas navegam e `Ctrl+↑`/`Ctrl+↓` reordenam. `Ctrl+Z` e `Ctrl+Y` desfazem e refazem, inclusive o que mudou no espaço. As tarefas têm a caixa de marcar no próprio balão (ou o atalho de concluir, `Ctrl+Enter`), e cada ramo mostra quantas tarefas estão feitas.
-  - **Mover os balões**: arraste um tópico para o vazio e ele fica ali, com o ramo junto (**Voltar ao lugar automático** no botão direito, ou **Reorganizar** na barra, desfaz); solte-o sobre outro tópico para mudá-lo de ramo. Arraste o fundo para mover a vista e role para dar zoom.
-  - **Painel ao lado**: numa tarefa ou nota, a aba **Documento** mostra o título, Pendente/Concluído e o editor completo da nota, como na árvore do espaço (o botão de expandir alarga o painel). A aba **Tópico** guarda um **link** (aberto no navegador), uma nota só do mapa, a **cor** (borda ou fundo), o **formato** do balão (arredondado, pílula, retângulo ou sem borda), **negrito** e **texto grande**.
-  - **Barra**: busca no mapa (`Ctrl+F`; `Enter` vai ao próximo resultado e abre os ramos recolhidos), arranjo **Mapa** (dois lados), **Horizontal**, **Vertical** ou **Radial**; espessura e cor das linhas; expandir ou recolher tudo; **Reorganizar**; **Recriar do espaço**; tema claro ou escuro; **Salvar imagem** (PNG).
-  - O mapa vai junto nos backups, na importação, ao duplicar o espaço e ao salvá-lo como biblioteca. Na árvore do espaço, o menu **⋯** de um item também tem **Adicionar subitem**.
-- **Temporizador de foco**: o botão de relógio na barra do documento começa uma sessão de 15, 25, 50 ou 90 minutos e entra no modo foco, ou uma pausa de 5 ou 15. O contador fica no canto da tela com pausar e parar; no fim, toca um aviso curto, aparece uma notificação do sistema e o app sugere o próximo passo. As sessões do dia são contadas. Também na busca (`Ctrl+K`): "Iniciar foco de 25 minutos".
-- **Aparência** (Configurações → Geral): cor de destaque (prontas ou qualquer outra), densidade confortável ou compacta, cartões com borda, com sombra ou planos, e cantos suaves, retos ou arredondados. Vale nos temas claro e escuro e vai junto no backup.
+<details>
+<summary><b>Espaços, fichas e bibliotecas</b></summary>
 
-Na primeira abertura, o espaço **Bem-vindo ao OpsiNote** é um tour para fazer usando o próprio app: tem uma ficha com variáveis de exemplo, um item que mostra uma variável ao vivo e passos para cada recurso. Para refazê-lo, use **Fazer o tour de boas-vindas** na Ajuda ou o comando na busca (`Ctrl+K`). Os espaços do trilho são reordenados arrastando, e as seções recolhidas continuam recolhidas na próxima vez.
+<br>
 
-## Atalhos de teclado
+- **Espaço**: o que você acompanha. Tem seções, e cada seção tem um checklist e notas.
+- **Ficha**: primeira linha da árvore do espaço. Os campos mudam com a categoria (*Pentest*, *Estudo*, *Projeto*, *Tarefas*, *Geral*) e guardam as variáveis usadas nos snippets.
+- **Bibliotecas**: checklists reutilizáveis. Crie um espaço a partir de uma, ou salve um espaço como biblioteca.
+- **Modelos de nota**: estruturas prontas, como relatório de vulnerabilidade ou ata.
+- **Fixados** e **Lixeira**: fixe o que mais usa no topo; o que é excluído pode ser restaurado por 30 dias.
+
+Duplicar e mover ficam no menu **⋯** de cada linha; o botão direito num espaço abre as ações dele.
+
+</details>
+
+<details>
+<summary><b>Snippets e variáveis</b></summary>
+
+<br>
+
+- Crie um snippet como `nmap -sV {{ip}}` e copie com um clique: `{{ip}}` vira o valor da ficha.
+- Numa nota, digite `s/` para inserir um snippet já preenchido, ou `/` para inserir uma variável que acompanha a ficha.
+
+</details>
+
+<details>
+<summary><b>Mapa mental</b></summary>
+
+<br>
+
+Cada espaço tem um mapa: seções nos ramos, tarefas e notas nos tópicos. Criar, renomear, marcar ou mover no mapa muda o espaço, e vice-versa. `Tab` cria um filho, `Enter` um irmão, e a barra tem arranjos, busca e **Salvar imagem** (PNG).
+
+</details>
+
+<details>
+<summary><b>Foco e aparência</b></summary>
+
+<br>
+
+O botão de relógio no documento inicia sessões de foco de 15 a 90 minutos. Em **Configurações → Geral**, escolha tema, cor de destaque, densidade, estilo dos cartões e dos cantos.
+
+</details>
+
+<details>
+<summary><b>Atalhos principais</b></summary>
+
+<br>
 
 | Atalho | O que faz |
 | --- | --- |
-| `Ctrl+K` | Busca em tudo (títulos e conteúdo) e executa comandos |
+| `Ctrl+K` | Busca em tudo e executa comandos |
 | `Ctrl+/` | Lista todos os atalhos |
-| `Ctrl+,` | Abre as configurações |
-| `F1` | Abre a ajuda (guia de uso com exemplos práticos) |
+| `F1` | Ajuda |
 | `Ctrl+Shift+N` | Novo espaço |
-| `Ctrl+\` | Expande ou recolhe o menu |
-| `Ctrl+Shift+F` | Modo foco (só o documento); `Esc` sai |
-| `Alt+↑` / `Alt+↓` | Item anterior / próximo da árvore |
-| `Ctrl+Enter` | Marca o item aberto como concluído ou pendente |
-| `Ctrl+Shift+D` | Duplica o item, nota, snippet ou modelo aberto |
-| `Ctrl+Shift+C` | Copia o snippet aberto com as variáveis preenchidas |
+| `Ctrl+Enter` | Marca o item como concluído |
+| `Ctrl+Shift+F` | Modo foco |
 
-Esses são os padrões. Em **Configurações → Atalhos**, clique num atalho e pressione a nova combinação (`Esc` cancela); cada um também pode ser removido ou voltar ao padrão. O app recusa, explicando o motivo:
+Todos podem ser trocados em **Configurações → Atalhos**.
 
-- uma combinação que já é de outra ação (duas ações nunca ficam com o mesmo atalho);
-- teclas sem `Ctrl` ou `Alt`, que atrapalhariam a digitação (as teclas `F1`–`F12` podem ser usadas sozinhas);
-- atalhos do editor e do sistema, como `Ctrl+C`, `Ctrl+V`, `Ctrl+Z`, `Ctrl+B` ou `Alt+F4`, e `Ctrl` com setas, `Home`, `End`, `Backspace` ou `Delete`;
-- `Ctrl+Alt` com letras, números ou símbolos, que no Windows é o `AltGr` (usado para digitar `@`, `€`, `/`…).
+</details>
 
-Os atalhos personalizados ficam salvos junto com os dados. `Esc` para sair do modo foco é fixo.
+<details>
+<summary><b>Seus dados</b></summary>
 
-## Rodar localmente
+<br>
+
+Tudo é salvo sozinho em `%APPDATA%\OpsiNote\opsinote-data.json`, com uma cópia `.bak` a cada gravação. O menu **Dados** (no trilho) exporta e importa:
+
+| Formato | Para quê |
+| --- | --- |
+| `.json` | Backup completo, sem perdas |
+| `.html` | Ler no navegador ou imprimir |
+| `.md` | Obsidian, Notion, GitHub |
+| `.csv` | Excel ou Google Planilhas |
+| `.txt` | Colar em qualquer lugar |
+
+</details>
+
+## Para desenvolvedores
+
+<details>
+<summary><b>Rodar, testar e lançar versões</b></summary>
+
+<br>
 
 Requer Node.js 20 ou mais recente.
 
@@ -84,81 +125,19 @@ npm install
 npm run dev
 ```
 
-Outros comandos:
-
 | Comando | O que faz |
 | --- | --- |
-| `npm run build` | Gera a versão de produção em `out/` |
-| `npm run preview` | Abre a versão de produção |
-| `npm run typecheck` | Verifica os tipos do TypeScript |
-| `npm test` | Roda os testes automatizados (`npm run test:watch` para rodar a cada alteração) |
-| `npm run package:win` | Gera o instalador para Windows em `release/` |
+| `npm run build` | Versão de produção em `out/` |
+| `npm run typecheck` | Verifica os tipos |
+| `npm test` | Testes automatizados |
+| `npm run package:win` | Instalador do Windows em `release/` |
+| `npm run docs:pdf` | Gera o manual em PDF a partir de `docs/manual/manual.html` |
 
-## Dados
+Para lançar: `npm version minor` (ou `patch`/`major`) e `git push --follow-tags`. O GitHub Actions testa, gera o instalador e publica a release.
 
-Tudo é salvo automaticamente em `opsinote-data.json`, na pasta de dados do usuário (no Windows, `%APPDATA%\OpsiNote`). Uma cópia `.bak` da versão anterior é mantida a cada gravação. Use o menu **Dados** (ícone de banco de dados no trilho à esquerda) para exportar. A exportação permite escolher o que entra no arquivo (espaços, bibliotecas, modelos e grupos de snippets, um a um) e, se quiser, zerar os checklists para compartilhar um roteiro sem o seu progresso. Formatos:
+Releases, ícone, assinatura do instalador e estrutura do código estão detalhados no capítulo 9 do [manual](docs/OpsiNote-Manual.pdf).
 
-| Formato | Para quê | Ao importar de volta |
-| --- | --- | --- |
-| Backup do OpsiNote (`.json`) | Levar tudo para outro computador | Sem perdas |
-| Página HTML (`.html`) | Ler no navegador ou imprimir em PDF | Sem perdas (os dados vão embutidos na página) |
-| Markdown (`.md`) | Obsidian, Notion, GitHub, qualquer editor | Mantém estrutura, ficha, cores e formatação |
-| Planilha CSV (`.csv`) | Excel ou Google Planilhas, uma linha por item | Mantém itens, conclusão e variáveis; sem imagens |
-| Texto simples (`.txt`) | Colar em qualquer lugar | Mantém a estrutura; sem formatação nem imagens |
-
-O CSV usa `;` como separador e é salvo em UTF-8 com BOM, que é o que o Excel em português abre direto. Células que começam com `=`, `+`, `-` ou `@` ganham um `'` na frente, para o Excel não executá-las como fórmula (um payload nas notas não vira ataque a quem abre a planilha); a importação tira o `'` de volta.
-
-**Importar** aceita todos esses formatos, um ou vários arquivos de uma vez, e acrescenta o conteúdo ao que já existe. Arquivos de outros apps também entram:
-
-- **Markdown**: `#` vira espaço, `##` seção, `###` nota e `- [ ]` / `- [x]` itens do checklist. Um arquivo sem títulos vira uma nota com o nome do arquivo.
-- **HTML**: uma página qualquer vira uma nota, sem scripts, estilos nem eventos.
-- **CSV**: cada linha vira um item do checklist, com as outras colunas no conteúdo. Uma coluna como *Status* ou *Concluído* marca o item.
-- **Texto**: linhas `[ ]` / `[x]` viram itens do checklist e o resto, uma nota.
-
-O app abre uma janela só: abrir de novo traz a janela existente para a frente, para duas cópias nunca gravarem por cima uma da outra. Se uma gravação falhar (disco cheio, arquivo bloqueado ou somente leitura), um aviso fica no topo da tela e o app tenta de novo sozinho; ao fechar com alterações não salvas, ele pergunta antes. Se o arquivo de dados for de uma versão mais nova ou estiver em formato desconhecido, o app mostra o erro e não altera nada.
-
-As imagens coladas nas notas ficam em `%APPDATA%\OpsiNote\attachments`, uma vez só por imagem, e o JSON guarda apenas o endereço delas. Isso mantém o salvamento rápido mesmo com muitas capturas de tela. Ao exportar, as imagens vão embutidas no arquivo, para o backup funcionar em outro computador. Dados antigos com imagens embutidas são convertidos sozinhos na primeira abertura, e imagens que nada mais usa são apagadas depois de um dia.
-
-O app nunca busca imagens na internet: ao colar conteúdo de um site, as imagens remotas viram um link para o endereço delas (`[imagem externa] https://…`). Assim, abrir uma nota não revela seu IP nem o horário de leitura ao site de origem.
-
-Links nas notas abrem no navegador com `Ctrl+clique`.
-
-## Releases e atualizações
-
-As releases são montadas sozinhas pelo GitHub Actions (`.github/workflows/release.yml`). Para lançar uma versão:
-
-```bash
-npm version minor        # ou patch (correções) / major: muda o package.json, faz o commit e cria a tag
-git push --follow-tags   # envia o commit e a tag
-```
-
-A tag `v*` enviada dispara o workflow, que confere se a tag bate com o `package.json`, roda o typecheck e os testes, gera o instalador do Windows e cria a release com as notas geradas a partir dos commits. Acompanhe em **Actions** no GitHub; se algo falhar, nada é publicado, e os arquivos gerados ficam para baixar na página da execução. Tags com hífen (`v0.2.0-beta.1`) viram pré-release.
-
-Cada release leva quatro arquivos: `OpsiNote-Setup-<versão>.exe` (o instalador), `latest.yml` e o `.blockmap` (usados pela atualização automática), e `OpsiNote-Setup.exe`, uma cópia do instalador com nome fixo para o botão de download do README (`releases/latest/download/OpsiNote-Setup.exe` sempre aponta para a versão mais recente). O app instalado procura versões novas nas releases deste repositório (bloco `publish` do `electron-builder.yml`). Quando uma termina de baixar, ele mostra **Reiniciar e atualizar**; se você não reiniciar, ela é instalada ao fechar o app.
-
-Para gerar o instalador no seu computador, sem publicar: `npm run package:win` (sai em `release/`).
-
-### Ícone
-
-O desenho original é `build/icon.svg`. Dele saem `build/icon.png` (512 px, para Linux e macOS) e `build/icon.ico` (Windows, com cada tamanho de 16 a 256 px desenhado do SVG, e não reduzido, para ficar nítido na barra de tarefas). Se mudar o SVG, gere os dois de novo.
-
-No Windows, o ícone da barra de tarefas vem da identidade do app (AppUserModelID), não da janela, e o Windows guarda esse ícone em cache por id. Por isso o app instalado usa `app.opsinote.notes` (o `appId` do `electron-builder.yml`) e o de desenvolvimento usa `app.opsinote.notes.dev`: se os dois dividissem o id, o ícone do `electron.exe` (o átomo do Electron) ficaria preso ao app instalado.
-
-Para o Windows não mostrar o aviso do SmartScreen, o instalador precisa ser assinado com um certificado de assinatura de código. Com o certificado em mãos, defina `CSC_LINK` (caminho do `.pfx`) e `CSC_KEY_PASSWORD` antes de gerar o instalador; o electron-builder assina sozinho.
-
-## Estrutura
-
-```
-src/
-  main/       processo principal do Electron (janela, arquivos, imagens, atualização)
-  preload/    ponte segura entre a janela e o processo principal
-  renderer/   interface em React
-    src/components/   telas e componentes
-    src/lib/          lógica sem interface: lixeira, mover/duplicar, busca, variáveis, atalhos,
-                      importação e exportação nos vários formatos, HTML ↔ Markdown
-                      (cada uma com seu arquivo .test.ts)
-    src/store.ts      estado do app (Zustand)
-```
+</details>
 
 ## Licença
 

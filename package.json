@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "package": "npm run build && electron-builder --publish never",
-    "package:win": "npm run build && electron-builder --win --publish never"
+    "package:win": "npm run build && electron-builder --win --publish never",
+    "docs:pdf": "node scripts/build-manual.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
