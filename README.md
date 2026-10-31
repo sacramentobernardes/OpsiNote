@@ -1,11 +1,15 @@
 # OpsiNote
 
+<p align="center">
+  <img src="build/icon.png" alt="Ícone do OpsiNote" width="128">
+</p>
+
 Aplicativo desktop para organizar notas, checklists e acompanhamento de alvos de pentest, estudos, projetos e tarefas.
 
 <h2 align="center">Download</h2>
 
 <p align="center">
-  <a href="https://github.com/sacramentobernardes/OpsiNote/releases/latest"><img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Baixar para Windows" height="40"></a>
+  <a href="https://github.com/sacramentobernardes/OpsiNote/releases/latest"><img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0wIDMuNCA5LjggMnY5LjVIMHpNMTEgMS44IDI0IDB2MTEuNEgxMXpNMCAxMi42aDkuOFYyMkwwIDIwLjZ6TTExIDEyLjZoMTNWMjRsLTEzLTEuOHoiLz48L3N2Zz4%3D" alt="Baixar para Windows" height="40"></a>
 </p>
 
 <p align="center">
