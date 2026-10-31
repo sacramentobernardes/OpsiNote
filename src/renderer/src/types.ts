@@ -12,6 +12,8 @@ export interface Entry {
   done?: boolean
   /** Fixado no topo da lista e na seção Fixados do Início. */
   pinned?: boolean
+  /** Subitem de outra entrada da mesma seção (criado no mapa mental ou em "Adicionar subitem"). */
+  parentId?: string
 }
 
 export interface Section {
@@ -43,6 +45,54 @@ export interface TargetSheet {
   fields: Record<string, string>
 }
 
+/** Seção ou item do espaço que um nó do mapa mental representa (sem `entryId`, é a seção). */
+export interface MindRef {
+  sectionId: string
+  list?: ListType
+  entryId?: string
+}
+
+/** Nó do mapa mental (ver lib/mindmap.ts). */
+export interface MindNode {
+  id: string
+  text: string
+  children: MindNode[]
+  /** Filhos escondidos. */
+  collapsed?: boolean
+  /** Texto longo, mostrado no painel ao lado em vez de no desenho. */
+  note?: string
+  /** Endereço aberto no navegador. */
+  url?: string
+  color?: string
+  /** Fundo na cor do nó (senão, só a borda). */
+  filled?: boolean
+  /** Formato do balão; sem ele, arredondado. */
+  shape?: MindShape
+  bold?: boolean
+  /** Texto maior. */
+  big?: boolean
+  ref?: MindRef
+}
+
+export type MindShape = 'pill' | 'rect' | 'plain'
+
+export type MindLayout = 'map' | 'right' | 'down' | 'radial'
+
+export interface MindMap {
+  root: MindNode
+  /** Padrão: 'map' (ramos para os dois lados). */
+  layout?: MindLayout
+  /** Espessura das linhas, de 1 a 6. */
+  lineWidth?: number
+  /** Uma cor só para as linhas; sem ela, cada ramo usa a cor do próprio nó. */
+  lineColor?: string
+  /**
+   * Tópicos arrastados para fora do lugar automático, por arranjo: deslocamento (x, y) em relação
+   * ao lugar calculado. O ramo inteiro vai junto.
+   */
+  moved?: Partial<Record<MindLayout, Record<string, [number, number]>>>
+}
+
 /** Espaços (workspaces) e bibliotecas compartilham a mesma estrutura. */
 export interface Board {
   id: string
@@ -51,6 +101,8 @@ export interface Board {
   color?: string
   sections: Section[]
   sheet?: TargetSheet
+  /** Mapa mental editado. Sem ele, o mapa é gerado das seções e itens. */
+  mindmap?: MindMap
   /** Fixado no topo do trilho e na seção Fixados do Início. */
   pinned?: boolean
   createdAt: number
@@ -153,5 +205,6 @@ export type View =
   | { type: 'libraries' }
   | { type: 'snippets' }
   | { type: 'trash' }
-  | { type: 'graph' }
+  /** Sem `board`, abre o último mapa visto. */
+  | { type: 'mindmap'; board?: { type: BoardType; id: string } }
   | { type: 'settings'; tab?: SettingsTab }

@@ -7,7 +7,7 @@
  */
 import type { AppData, Board, BoardType, Entry, TargetSheet } from '../types'
 import { SHEET_SPECS } from './sheets'
-import { KIND_LABELS } from './util'
+import { KIND_LABELS, isTask, progress as progressOf } from './util'
 import { escapeHtml } from './text'
 import { escapeInline, htmlToMarkdown, htmlToPlainText, sanitizeHtml } from './html'
 
@@ -131,7 +131,7 @@ function boardMarkdown(type: BoardType, b: Board): string {
       const body = mdContent(e.content)
       return `### ${box}${mdTitle(e.title)}${body ? `\n\n${body}` : ''}`
     }
-    for (const e of s.checklist) out.push(entry(e, e.done ? '[x] ' : '[ ] '))
+    for (const e of s.checklist) out.push(entry(e, !isTask(e) ? '↳ ' : e.done ? '[x] ' : '[ ] '))
     for (const e of s.notes) out.push(entry(e, ''))
   }
   return out.join('\n\n')
@@ -183,7 +183,7 @@ export function toText(data: AppData): string {
         const body = htmlToPlainText(e.content)
         lines.push(body ? `${head}${e.title}\n${indent(body, '    ')}` : `${head}${e.title}`)
       }
-      for (const e of s.checklist) entry(e.done ? '[x] ' : '[ ] ', e)
+      for (const e of s.checklist) entry(!isTask(e) ? '    ↳ ' : e.done ? '[x] ' : '[ ] ', e)
       for (const e of s.notes) entry('• ', e)
       if (lines.length) out.push(lines.join('\n'))
     }
@@ -231,7 +231,7 @@ export function toCsv(data: AppData): string {
     board.sections.forEach((s, i) => {
       const sn = `${n}.${i + 1}`
       if (s.checklist.length + s.notes.length === 0) rows.push([...base, s.title, '', '', '', '', sn])
-      for (const e of s.checklist) rows.push([...base, s.title, 'Checklist', e.title, e.done ? 'Sim' : 'Não', content(e.content), sn])
+      for (const e of s.checklist) rows.push([...base, s.title, isTask(e) ? 'Checklist' : 'Subitem', e.title, !isTask(e) ? '' : e.done ? 'Sim' : 'Não', content(e.content), sn])
       for (const e of s.notes) rows.push([...base, s.title, 'Nota', e.title, '', content(e.content), sn])
     })
     // Espaço vazio: uma linha só com o nome, para ele não sumir.
@@ -311,10 +311,10 @@ const colorStyle = (name: string, color: string | undefined): string =>
   color && /^#[0-9a-f]{3,8}$/i.test(color) ? ` style="--${name}:${color}"` : ''
 
 function entryHtml(e: Entry, checklist: boolean): string {
-  const box = checklist ? `<span class="box">${e.done ? '☑' : '☐'}</span>` : ''
+  const box = checklist ? `<span class="box">${!isTask(e) ? '↳' : e.done ? '☑' : '☐'}</span>` : ''
   const style = colorStyle('entry', e.color)
   const body = e.content.trim() ? `<div class="content">${htmlContent(e.content)}</div>` : ''
-  return `<article class="entry${checklist && e.done ? ' done' : ''}"${style}><h4>${box}${escapeHtml(e.title)}</h4>${body}</article>`
+  return `<article class="entry${checklist && isTask(e) && e.done ? ' done' : ''}"${style}><h4>${box}${escapeHtml(e.title)}</h4>${body}</article>`
 }
 
 function boardHtml(type: BoardType, b: Board, anchor: string): string {
@@ -334,8 +334,7 @@ function boardHtml(type: BoardType, b: Board, anchor: string): string {
     )
     .join('')
   const style = colorStyle('board', b.color)
-  const done = b.sections.reduce((n, s) => n + s.checklist.filter((e) => e.done).length, 0)
-  const total = b.sections.reduce((n, s) => n + s.checklist.length, 0)
+  const { done, total } = progressOf(b.sections)
   const progress = type === 'workspace' && total > 0 ? ` · ${done} de ${total} concluídos` : ''
   return `<section class="board" id="${anchor}"${style}><h2>${escapeHtml(b.title)}</h2><p class="meta">${TYPE_LABEL[type]} · ${
     KIND_LABELS[b.kind]

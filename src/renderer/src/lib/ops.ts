@@ -3,7 +3,8 @@
  * então servem tanto para rascunhos do Immer (no store) quanto para objetos comuns (nos testes).
  */
 import type { AppData, Board, BoardType, Entry, ListType, Section, SnippetGroup, Template } from '../types'
-import { newId } from './util'
+import { newId, relinkParents } from './util'
+import { copiedIds, copyMindMap } from './mindmap'
 
 export const boardsOf = (data: AppData, type: BoardType): Board[] => (type === 'workspace' ? data.workspaces : data.libraries)
 
@@ -30,12 +31,27 @@ function adaptEntry(e: Entry, list: ListType): Entry {
   return note
 }
 
-export const cloneSection = (s: Section): Section => ({
-  ...s,
-  id: newId(),
-  checklist: s.checklist.map(cloneEntry),
-  notes: s.notes.map(cloneEntry)
-})
+export function cloneSection(s: Section): Section {
+  const ids = new Map<string, string>()
+  const copy = (e: Entry): Entry => {
+    const c = cloneEntry(e)
+    ids.set(e.id, c.id)
+    return c
+  }
+  const out = { ...s, id: newId(), checklist: s.checklist.map(copy), notes: s.notes.map(copy) }
+  relinkParents(out, ids)
+  return out
+}
+
+/** Os subitens de uma entrada que sai da seção passam para o pai dela (ou para o primeiro nível). */
+export function liftChildren(section: Section, entryId: string, parentId: string | undefined): void {
+  for (const list of ['checklist', 'notes'] as const)
+    for (const e of section[list]) {
+      if (e.parentId !== entryId) continue
+      if (parentId && parentId !== e.id) e.parentId = parentId
+      else delete e.parentId
+    }
+}
 
 /* ---------- Entradas ---------- */
 
@@ -72,7 +88,9 @@ export function moveEntryTo(data: AppData, ref: EntryRef, dest: SectionDest): bo
   if (!from || !to || index < 0) return false
   if (from === to && ref.list === dest.list) return false
   const [entry] = from[ref.list].splice(index, 1)
+  liftChildren(from, entry.id, entry.parentId)
   const moved = adaptEntry(entry, dest.list)
+  delete moved.parentId
   // Como ao mover seções: em biblioteca não há progresso, o item fica pendente.
   if (dest.boardType === 'library' && dest.list === 'checklist') moved.done = false
   to[dest.list].push(moved)
@@ -129,6 +147,8 @@ export function duplicateBoard(data: AppData, type: BoardType, id: string): stri
     createdAt: now,
     updatedAt: now
   }
+  if (src.mindmap) copy.mindmap = copyMindMap(src.mindmap, copiedIds(src.sections, copy.sections))
+  else delete copy.mindmap
   list.splice(index + 1, 0, copy)
   return copy.id
 }

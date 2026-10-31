@@ -2,6 +2,18 @@
 
 Aplicativo desktop para organizar notas, checklists e acompanhamento de alvos de pentest, estudos, projetos e tarefas.
 
+<h2 align="center">Download</h2>
+
+<p align="center">
+  <a href="https://github.com/sacramentobernardes/OpsiNote/releases/latest"><img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Baixar para Windows" height="40"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/sacramentobernardes/OpsiNote/releases/latest"><img src="https://img.shields.io/github/v/release/sacramentobernardes/OpsiNote?label=vers%C3%A3o&color=0078D6" alt="Versão mais recente"></a>
+</p>
+
+Baixe o `OpsiNote-Setup-<versão>.exe` em **Assets** na página da release. Depois de instalado, o app se atualiza sozinho.
+
 ## Conceitos
 
 - **Espaços**: o que você está acompanhando (um alvo, uma matéria, um projeto, uma lista de tarefas). Cada espaço tem seções, e cada seção tem um checklist e notas.
@@ -23,10 +35,12 @@ Aplicativo desktop para organizar notas, checklists e acompanhamento de alvos de
 Itens, notas, seções, snippets, modelos e espaços podem ser duplicados e movidos pelo menu **⋯** de cada linha. Clicar com o **botão direito** num espaço (no trilho ou no Início) ou numa biblioteca abre as ações dele: abrir, renomear, mudar a cor e a categoria, duplicar, salvar como biblioteca ou criar um espaço a partir dela, exportar só ele e excluir (pelo teclado: tecla de menu ou `Shift+F10`).
 
 - **Fixados**: espaços, itens, notas e snippets podem ser fixados no topo (menu **⋯** ou botão direito → **Fixar no topo**). Eles aparecem primeiro nas listas e no trilho, na seção **Fixados** do Início e na busca antes de digitar. A ordem guardada não muda: desafixar devolve o item ao lugar.
-- **Grafo** (ícone no trilho): mostra como espaços, tarefas, notas e, se quiser, bibliotecas e snippets se ligam. Cada espaço se liga às próprias tarefas e notas, e um texto se liga a outro quando cita o título dele (solto ou como `[[Título]]`, sem ligar para acentos). Títulos repetidos, curtos (menos de 4 letras) ou genéricos ("Novo espaço") não geram ligação. Clique num nó para abrir o conteúdo, arraste para mover, role para dar zoom. O painel ao lado lista os **mais conectados** e as tarefas e notas **sem nenhuma conexão** (e pode destacá-las no grafo).
-  - **Ligar pelo grafo**: `Shift` + arraste de uma nota ou tarefa até outro nó, ou botão direito → **Ligar a outro nó…**. A nota ganha `[[Título]]` no fim do texto; o aviso tem **Desfazer**. Só notas e tarefas recebem a menção, e o app explica quando não dá (título repetido, curto ou genérico, ou já ligados).
-  - **Botão direito num nó**: abrir, **ver só a vizinhança** (o nó e os vizinhos a 1, 2 ou 3 passos), ligar, copiar `[[Título]]` e fixar no topo. Pelo teclado: Tab até o nó e tecla de menu ou `Shift+F10`.
-  - **Cores por** espaço, tipo ou categoria; **Ocultar concluídas**; **Salvar imagem** grava o grafo como PNG. Filtros e cores ficam lembrados neste computador.
+- **Mapa mental** (ícone no trilho, ou **Ver mapa mental** no menu de um espaço ou biblioteca): cada espaço tem o seu, com o espaço no centro, as seções nos ramos e as tarefas e notas nos tópicos. O mapa e o espaço andam juntos: criar um tópico embaixo da raiz cria uma seção; embaixo de uma seção, uma tarefa; embaixo de uma tarefa, um **subitem** dela, que aparece recuado embaixo dela na árvore do espaço. Subitens não são tarefas: não têm caixa de marcar e não contam no progresso. Tópicos soltos que já estavam embaixo de seções e tarefas (de mapas da versão anterior) viram itens do espaço ao abrir o mapa. Renomear, marcar, reordenar, mudar de ramo ou excluir (os itens vão para a lixeira) também muda o espaço, e o que muda no espaço aparece no mapa. Tópicos criados embaixo de um tópico solto ficam só no mapa.
+  - **Editar**: duplo clique (ou `F2`) muda o texto; `Tab` cria um filho, `Enter` um irmão, `Delete` exclui (com **Desfazer**), `Espaço` recolhe ou expande, as setas navegam e `Ctrl+↑`/`Ctrl+↓` reordenam. `Ctrl+Z` e `Ctrl+Y` desfazem e refazem, inclusive o que mudou no espaço. As tarefas têm a caixa de marcar no próprio balão (ou o atalho de concluir, `Ctrl+Enter`), e cada ramo mostra quantas tarefas estão feitas.
+  - **Mover os balões**: arraste um tópico para o vazio e ele fica ali, com o ramo junto (**Voltar ao lugar automático** no botão direito, ou **Reorganizar** na barra, desfaz); solte-o sobre outro tópico para mudá-lo de ramo. Arraste o fundo para mover a vista e role para dar zoom.
+  - **Painel ao lado**: numa tarefa ou nota, a aba **Documento** mostra o título, Pendente/Concluído e o editor completo da nota, como na árvore do espaço (o botão de expandir alarga o painel). A aba **Tópico** guarda um **link** (aberto no navegador), uma nota só do mapa, a **cor** (borda ou fundo), o **formato** do balão (arredondado, pílula, retângulo ou sem borda), **negrito** e **texto grande**.
+  - **Barra**: busca no mapa (`Ctrl+F`; `Enter` vai ao próximo resultado e abre os ramos recolhidos), arranjo **Mapa** (dois lados), **Horizontal**, **Vertical** ou **Radial**; espessura e cor das linhas; expandir ou recolher tudo; **Reorganizar**; **Recriar do espaço**; tema claro ou escuro; **Salvar imagem** (PNG).
+  - O mapa vai junto nos backups, na importação, ao duplicar o espaço e ao salvá-lo como biblioteca. Na árvore do espaço, o menu **⋯** de um item também tem **Adicionar subitem**.
 - **Temporizador de foco**: o botão de relógio na barra do documento começa uma sessão de 15, 25, 50 ou 90 minutos e entra no modo foco, ou uma pausa de 5 ou 15. O contador fica no canto da tela com pausar e parar; no fim, toca um aviso curto, aparece uma notificação do sistema e o app sugere o próximo passo. As sessões do dia são contadas. Também na busca (`Ctrl+K`): "Iniciar foco de 25 minutos".
 - **Aparência** (Configurações → Geral): cor de destaque (prontas ou qualquer outra), densidade confortável ou compacta, cartões com borda, com sombra ou planos, e cantos suaves, retos ou arredondados. Vale nos temas claro e escuro e vai junto no backup.
 

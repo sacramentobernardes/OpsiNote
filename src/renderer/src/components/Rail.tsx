@@ -20,7 +20,7 @@ import {
   Trash2,
   Upload,
   Pin,
-  Waypoints,
+  Network,
 } from 'lucide-react'
 import { useBindings, useStore } from '../store'
 import type { Board, Theme, View } from '../types'
@@ -170,8 +170,8 @@ export function Rail(): ReactNode {
         >
           <BookCopy size={18} />
         </RailButton>
-        <RailButton label="Grafo" active={view.type === 'graph'} onClick={() => go({ type: 'graph' })}>
-          <Waypoints size={18} />
+        <RailButton label="Mapa mental" active={view.type === 'mindmap'} onClick={() => go({ type: 'mindmap' })}>
+          <Network size={18} />
         </RailButton>
         <RailButton label="Snippets" active={view.type === 'snippets'} onClick={() => go({ type: 'snippets' })}>
           <Terminal size={18} />

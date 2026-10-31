@@ -314,7 +314,7 @@ ipcMain.handle('file:export', async (event, content: unknown, defaultName: unkno
   return true
 })
 
-/** Salva um pedaço da janela como PNG (o grafo). `rect` em pixels da página. */
+/** Salva um pedaço da janela como PNG (o mapa mental). `rect` em pixels da página. */
 ipcMain.handle('window:save-image', async (event, rect: unknown, defaultName: unknown) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   const r = rect as { x?: unknown; y?: unknown; width?: unknown; height?: unknown } | null
@@ -324,7 +324,7 @@ ipcMain.handle('window:save-image', async (event, rect: unknown, defaultName: un
   if (width <= 0 || height <= 0) return false
   const image = await win.webContents.capturePage({ x: Math.max(0, x), y: Math.max(0, y), width, height })
   const result = await dialog.showSaveDialog(win, {
-    defaultPath: typeof defaultName === 'string' ? defaultName : 'opsinote-grafo.png',
+    defaultPath: typeof defaultName === 'string' ? defaultName : 'opsinote-mapa.png',
     filters: [{ name: 'Imagem PNG', extensions: ['png'] }]
   })
   if (result.canceled || !result.filePath) return false

@@ -4295,412 +4295,6 @@ code {
   font-size: 13.5px;
 }
 
-/* ---------- Grafo ---------- */
-
-.graph-view {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  background: var(--bg);
-}
-
-.graph-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px 24px;
-  padding: 20px 24px 14px;
-  border-bottom: 1px solid var(--border);
-}
-
-.graph-head h1 {
-  margin: 0 0 2px;
-  font-size: 22px;
-}
-
-.graph-head p {
-  max-width: 620px;
-  margin: 0;
-}
-
-.graph-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-
-.graph-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.graph-body {
-  display: grid;
-  flex: 1;
-  grid-template-columns: minmax(0, 1fr) 260px;
-  min-height: 0;
-}
-
-.graph-canvas {
-  position: relative;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--text-3) 25%, transparent) 1px, transparent 0) 0 0 / 22px 22px,
-    var(--bg);
-}
-
-.graph-svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-}
-
-.graph-svg:active {
-  cursor: grabbing;
-}
-
-.graph-empty {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-content: center;
-  margin: 0;
-}
-
-/* Ligações: poucos <path> (um por tipo, mais as do nó em destaque). A espessura não muda com o zoom. */
-.graph-links {
-  fill: none;
-  vector-effect: non-scaling-stroke;
-  stroke: color-mix(in srgb, var(--text-3) 45%, transparent);
-  stroke-width: 1;
-  pointer-events: none;
-  transition: opacity 0.15s;
-}
-
-.graph-links.mentions {
-  stroke: var(--accent);
-  stroke-width: 1.6;
-  opacity: 0.8;
-}
-
-.graph-links.near.contains {
-  stroke: var(--text-2);
-  stroke-width: 1.5;
-}
-
-.graph-links.near.mentions {
-  stroke-width: 2.4;
-  opacity: 1;
-}
-
-/* Modos de destaque: o contêiner apaga tudo menos o que está marcado. */
-.graph-canvas:is(.hovering, .searching, .orphans) .graph-links:not(.near) {
-  opacity: 0.08;
-}
-
-.graph-canvas.hovering .graph-node:not(.near),
-.graph-canvas.searching .graph-node:not(.match),
-.graph-canvas.orphans .graph-node:not(.orphan, .workspace, .library) {
-  opacity: 0.15;
-}
-
-.graph-canvas.hovering .graph-node:not(.near) .graph-label,
-.graph-canvas.searching .graph-node:not(.match) .graph-label {
-  display: none;
-}
-
-
-.graph-node {
-  --node-color: var(--text-3);
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.graph-node circle {
-  fill: var(--node-color);
-  stroke: var(--surface);
-  stroke-width: 2;
-}
-
-.graph-node.workspace,
-.graph-node.library {
-  --node-color: var(--accent);
-}
-
-.graph-node.workspace circle {
-  stroke-width: 3;
-}
-
-.graph-node.library circle {
-  fill: var(--surface);
-  stroke: var(--node-color);
-  stroke-width: 3;
-}
-
-.graph-node.task circle {
-  fill: color-mix(in srgb, var(--node-color) 55%, var(--surface));
-}
-
-.graph-node.task.done circle {
-  fill: color-mix(in srgb, var(--node-color) 25%, var(--surface));
-}
-
-.graph-node.snippet circle {
-  fill: var(--surface);
-  stroke: var(--text-2);
-  stroke-width: 1.5;
-}
-
-.graph-node.orphan circle {
-  stroke: var(--danger);
-  stroke-width: 2.5;
-  stroke-dasharray: 3 2;
-}
-
-.graph-node.match circle,
-.graph-node.hovered circle {
-  stroke: var(--text);
-  stroke-width: 3;
-}
-
-.graph-label {
-  display: none;
-  fill: var(--text-2);
-  font-size: calc(11px / var(--k, 1));
-  text-anchor: middle;
-  paint-order: stroke;
-  stroke: var(--bg);
-  stroke-width: calc(3px / var(--k, 1));
-  pointer-events: none;
-}
-
-.graph-label.always {
-  display: block;
-  fill: var(--text);
-  font-size: calc(12.5px / var(--k, 1));
-  font-weight: 700;
-}
-
-.zoomed .graph-label,
-.graph-node.near .graph-label,
-.graph-node.match .graph-label {
-  display: block;
-}
-
-.graph-zoom {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 4px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow);
-}
-
-.graph-zoom .icon-btn {
-  width: 30px;
-  height: 30px;
-}
-
-.graph-tooltip {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  max-width: 320px;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow);
-  font-size: 12.5px;
-  pointer-events: none;
-}
-
-.graph-tooltip span {
-  color: var(--text-2);
-}
-
-.graph-side {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  min-height: 0;
-  padding: 16px;
-  overflow-y: auto;
-  border-left: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.graph-side h2 {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0 0 6px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--text-3);
-}
-
-.graph-side p {
-  margin: 0 0 8px;
-}
-
-.graph-count {
-  margin-left: auto;
-  padding: 0 7px;
-  border-radius: 999px;
-  background: var(--surface-2);
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0;
-  color: var(--text-2);
-}
-
-.graph-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-size: 13px;
-}
-
-.graph-legend li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.graph-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--text-3);
-}
-
-.graph-dot.workspace {
-  width: 14px;
-  height: 14px;
-  background: var(--accent);
-}
-
-.graph-dot.library {
-  width: 13px;
-  height: 13px;
-  border: 3px solid var(--accent);
-  background: transparent;
-}
-
-.graph-dot.task {
-  background: color-mix(in srgb, var(--text-3) 55%, var(--surface));
-}
-
-.graph-dot.snippet {
-  border: 1.5px solid var(--text-2);
-  background: transparent;
-}
-
-.graph-line {
-  width: 18px;
-  height: 0;
-  border-top: 1px solid var(--text-3);
-}
-
-.graph-line.mentions {
-  border-top: 2px solid var(--accent);
-}
-
-.graph-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.graph-orphans {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.graph-orphans button {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  width: 100%;
-  padding: 6px 8px;
-  border: 0;
-  border-radius: 7px;
-  background: none;
-  color: var(--text);
-  font: inherit;
-  font-size: 13px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.graph-orphans button > svg {
-  flex: none;
-  margin-top: 2px;
-  color: var(--text-3);
-}
-
-.graph-orphans button:hover,
-.graph-orphans button:focus-visible {
-  background: var(--accent-softer);
-}
-
-.graph-orphan-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.graph-orphan-text small {
-  overflow: hidden;
-  font-size: 11.5px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: var(--text-3);
-}
-
-@media (max-width: 860px) {
-  .graph-body {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
-  }
-
-  .graph-side {
-    max-height: 40vh;
-    border-top: 1px solid var(--border);
-    border-left: 0;
-  }
-}
-
 /* ---------- Temporizador do modo foco ---------- */
 
 .icon-btn.timer-running {
@@ -4780,101 +4374,707 @@ code {
   }
 }
 
-.graph-node:focus {
-  outline: none;
+
+/* ---------- Mapa mental ---------- */
+
+.mm-view {
+  --mm-line: color-mix(in srgb, var(--text-3) 70%, transparent);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg);
 }
 
-.graph-node:focus-visible circle {
-  stroke: var(--accent);
-  stroke-width: 4;
-}
-
-.graph-node:focus-visible .graph-label {
-  display: block;
-}
-
-.graph-no-match {
-  white-space: nowrap;
-}
-
-.graph-canvas.large :is(.graph-node, .graph-links) {
-  transition: none;
-}
-
-.graph-canvas.far .graph-node:not(.near, .match, :focus-visible) .graph-label.always {
-  display: none;
-}
-
-/* ---------- Grafo: vizinhança, ligações, cores e imagem ---------- */
-
-.graph-color-by {
-  display: inline-flex;
+.mm-head {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-2);
+  justify-content: space-between;
+  gap: 10px 20px;
+  padding: 16px 24px 12px;
+  border-bottom: 1px solid var(--border);
 }
 
-.graph-banner {
+.mm-title {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 12px;
-  padding: 8px 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--accent-softer);
+  min-width: 0;
+}
+
+.mm-title h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.mm-board {
+  max-width: 280px;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-weight: 600;
+}
+
+.mm-toolbar,
+.mm-group,
+.mm-lines {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.mm-toolbar {
+  gap: 10px 14px;
+}
+
+.mm-lines {
   font-size: 13px;
+  color: var(--text-2);
 }
 
-.graph-banner.linking {
-  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+.mm-lines select {
+  padding: 3px 4px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
 }
 
-.graph-depth {
-  display: inline-flex;
-  gap: 4px;
+.mm-hint {
+  flex-basis: 100%;
+  margin: 0;
 }
 
-.graph-new-link {
-  stroke: var(--accent);
-  stroke-width: 2;
-  stroke-dasharray: 6 4;
-  vector-effect: non-scaling-stroke;
+.mm-empty {
+  padding: 40px 24px;
+}
+
+.mm-body {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+}
+
+.mm-body.with-side {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.mm-canvas {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  cursor: grab;
+  outline: none;
+  touch-action: none;
+  user-select: none;
+  background:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--text-3) 22%, transparent) 1px, transparent 0) 0 0 / 22px 22px,
+    var(--bg);
+}
+
+.mm-canvas:active {
+  cursor: grabbing;
+}
+
+.mm-canvas:focus-visible {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.mm-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.mm-edges {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: visible;
   pointer-events: none;
 }
 
-.graph-pin-ring {
+.mm-edges path {
   fill: none;
-  stroke: var(--accent);
-  stroke-width: 1.5;
-  stroke-dasharray: 2 2;
+  stroke-linecap: round;
+}
+
+/* Tópico: cartão discreto; colorido ganha borda (ou fundo, se preenchido) na cor escolhida. */
+.mm-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  max-width: 260px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.35;
+  box-shadow: 0 1px 2px rgba(var(--tint), 0.06);
+  cursor: pointer;
+}
+
+.mm-node.branch {
+  padding: 7px 12px;
+  font-weight: 600;
+}
+
+.mm-node.colored {
+  border-color: var(--node-color);
+  background: color-mix(in srgb, var(--node-color) 10%, var(--surface));
+}
+
+.mm-node.filled {
+  border-color: var(--node-color);
+  background: var(--node-color);
+  color: var(--node-text, #ffffff);
+}
+
+.mm-node.root {
+  max-width: 320px;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.mm-node.selected {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.mm-node.done .mm-text {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.mm-node.dragging {
+  z-index: 2;
+  opacity: 0.75;
   pointer-events: none;
+  box-shadow: var(--shadow);
 }
 
-.graph-node.root circle:first-of-type {
-  stroke: var(--accent);
-  stroke-width: 4;
+.mm-node.drop-target {
+  outline: 2px dashed var(--accent);
+  outline-offset: 3px;
 }
 
-.graph-node.link-source circle:first-of-type {
-  stroke: var(--accent);
-  stroke-width: 4;
-  stroke-dasharray: 4 3;
+.mm-text {
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
-.graph-canvas.picking .graph-svg,
-.graph-canvas.picking .graph-node {
-  cursor: crosshair;
+.mm-edit {
+  min-width: 80px;
+  max-width: 236px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  field-sizing: content;
 }
 
-.graph-canvas.capturing :is(.graph-zoom, .graph-tooltip, .menu-popover) {
+.mm-icons {
+  display: inline-flex;
+  flex: none;
+  gap: 2px;
+}
+
+.mm-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  opacity: 0.65;
+  cursor: pointer;
+}
+
+.mm-icon:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+/* Botão de recolher: a bolinha onde saem as linhas dos filhos. */
+.mm-toggle {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border: 1px solid var(--mm-line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mm-toggle.right {
+  top: 50%;
+  right: -9px;
+  transform: translate(50%, -50%);
+}
+
+.mm-toggle.left {
+  top: 50%;
+  left: -9px;
+  transform: translate(-50%, -50%);
+}
+
+.mm-toggle.bottom {
+  bottom: -9px;
+  left: 50%;
+  transform: translate(-50%, 50%);
+}
+
+/* Vertical com as folhas em coluna: a linha desce do canto esquerdo. */
+.mm-toggle.bottom-left {
+  bottom: -9px;
+  left: 11px;
+  transform: translate(-50%, 50%);
+}
+
+.mm-toggle.closed {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mm-toggle:hover {
+  border-color: var(--accent);
+}
+
+.mm-zoom {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.mm-zoom-pct {
+  min-width: 42px;
+  font-size: 12px;
+  text-align: center;
+  color: var(--text-2);
+}
+
+.mm-canvas.capturing :is(.mm-zoom, .menu-popover) {
   display: none;
 }
 
-.graph-hubs button {
-  align-items: center;
+.mm-canvas.capturing .mm-node {
+  outline: none;
 }
 
-.graph-hubs .graph-count {
+/* Painel de detalhes do tópico. */
+.mm-side {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+  padding: 12px 16px 20px;
+  overflow-y: auto;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.mm-side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mm-side h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.mm-side h3 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.mm-side section {
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.mm-side section:first-of-type {
+  border-top: 0;
+}
+
+.mm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mm-field > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.mm-field :is(input, textarea) {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.mm-field textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.mm-field :is(input, textarea):focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.mm-linked-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.mm-linked-title > svg {
   flex: none;
+  margin-top: 2px;
+  color: var(--text-2);
+}
+
+.mm-linked-title span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mm-preview {
+  max-height: 180px;
+  margin: 8px 0;
+  padding: 8px 10px;
+  overflow-y: auto;
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 12.5px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--text-2);
+}
+
+.mm-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mm-open-link {
+  margin-top: 6px;
+}
+
+.mm-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mm-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.mm-side .btn.danger {
+  color: var(--danger);
+}
+
+@media (max-width: 860px) {
+  .mm-body.with-side {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .mm-side {
+    max-height: 45vh;
+    border-top: 1px solid var(--border);
+    border-left: 0;
+  }
+}
+
+/* Formatos e destaque dos balões. */
+.mm-node.shape-pill {
+  border-radius: 999px;
+  padding-inline: 14px;
+}
+
+.mm-node.shape-rect {
+  border-radius: 2px;
+}
+
+.mm-node.shape-plain {
+  border-color: transparent;
+  border-bottom: 2px solid var(--node-color, var(--text-3));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mm-node.bold {
+  font-weight: 700;
+}
+
+.mm-node.big {
+  font-size: 16px;
+}
+
+.mm-node.root.big {
+  font-size: 19px;
+}
+
+/* Caixa de marcar das tarefas, dentro do balão. */
+.mm-check-box {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--success);
+  cursor: pointer;
+}
+
+.mm-progress {
+  flex: none;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+/* O ramo que vai junto com o tópico arrastado. */
+.mm-node.dragging-along {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Busca: os outros tópicos ficam apagados. */
+.mm-node.dim {
+  opacity: 0.3;
+}
+
+.mm-node.match {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.mm-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-3);
+}
+
+.mm-search:focus-within {
+  border-color: var(--accent);
+}
+
+.mm-search input {
+  width: 160px;
+  padding: 2px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.mm-search-count {
+  white-space: nowrap;
+}
+
+/* Painel: abas, documento do item. */
+.mm-side-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.mm-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.mm-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mm-tab:hover {
+  background: var(--accent-softer);
+}
+
+.mm-tab.active {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.mm-body.with-doc {
+  grid-template-columns: minmax(0, 1fr) min(520px, 50%);
+}
+
+.mm-body.with-doc.wide {
+  grid-template-columns: minmax(0, 1fr) 68%;
+}
+
+.mm-side.doc {
+  padding-inline: 20px;
+}
+
+.mm-doc {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding-top: 8px;
+}
+
+.mm-doc-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.mm-crumbs {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mm-doc .doc-title {
+  margin: 0 0 10px -6px;
+  font-size: 24px;
+}
+
+.mm-doc .toolbar {
+  top: 0;
+  margin: 0 0 12px;
+}
+
+.mm-doc .editor-content .tiptap {
+  min-height: 30vh;
+}
+
+.mm-shapes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.mm-shape-dot {
+  display: inline-block;
+  width: 14px;
+  height: 9px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+}
+
+.mm-shape-dot.shape-pill {
+  border-radius: 999px;
+}
+
+.mm-shape-dot.shape-rect {
+  border-radius: 0;
+}
+
+.mm-shape-dot.shape-plain {
+  border-width: 0 0 1.5px;
+  border-radius: 0;
+}
+
+@media (max-width: 860px) {
+  .mm-body.with-doc,
+  .mm-body.with-doc.wide {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .mm-side.doc {
+    max-height: 60vh;
+  }
+
+  .mm-search input {
+    width: 110px;
+  }
+}
+
+/* Subitens na árvore do espaço: recuados embaixo do item pai. */
+.entry-children {
+  margin: 0;
+  padding: 0 0 0 18px;
+  border-left: 1px solid var(--border);
+  margin-left: 14px;
 }

@@ -7,6 +7,7 @@ import {
   CircleCheck,
   ClipboardList,
   Copy,
+  CornerDownRight,
   FileText,
   FolderInput,
   Layers,
@@ -241,6 +242,7 @@ const SectionNode = memo(function SectionNode({
 function useEntryActions(ref: EntryRef, pinned: boolean): { label: string; icon: ReactNode; danger?: boolean; hint?: string; onSelect: () => void }[] {
   const duplicateEntry = useStore((s) => s.duplicateEntry)
   const removeEntry = useStore((s) => s.removeEntry)
+  const addEntry = useStore((s) => s.addEntry)
   const setModal = useStore((s) => s.setModal)
   const duplicateKeys = useBinding('duplicate')
   const togglePin = useStore((s) => s.togglePin)
@@ -248,6 +250,12 @@ function useEntryActions(ref: EntryRef, pinned: boolean): { label: string; icon:
     pinned
       ? { label: 'Desafixar', icon: <PinOff size={14} />, onSelect: () => togglePin({ kind: 'entry', ref }) }
       : { label: 'Fixar no topo', icon: <Pin size={14} />, onSelect: () => togglePin({ kind: 'entry', ref }) },
+    {
+      label: 'Adicionar subitem',
+      icon: <CornerDownRight size={14} />,
+      onSelect: () =>
+        addEntry(ref.boardType, ref.boardId, ref.sectionId, ref.list, ref.list === 'checklist' ? 'Novo subitem' : 'Nova subnota', '', !window.matchMedia(NARROW).matches, ref.entryId)
+    },
     { label: 'Duplicar', icon: <Copy size={14} />, hint: comboHint(duplicateKeys), onSelect: () => duplicateEntry(ref) },
     { label: 'Mover para…', icon: <FolderInput size={14} />, onSelect: () => setModal({ type: 'move', target: { kind: 'entry', ref } }) },
     {
@@ -266,7 +274,8 @@ const EntryRow = memo(function EntryRow({
   list,
   entry,
   selected,
-  handle
+  handle,
+  sub
 }: {
   type: BoardType
   boardId: string
@@ -275,6 +284,8 @@ const EntryRow = memo(function EntryRow({
   entry: Entry
   selected: boolean
   handle: ReactNode
+  /** Subitem: um item embaixo do pai, sem caixa de marcar. */
+  sub?: boolean
 }): ReactNode {
   const selectItem = useStore((s) => s.selectItem)
   const updateEntry = useStore((s) => s.updateEntry)
@@ -283,12 +294,16 @@ const EntryRow = memo(function EntryRow({
 
   return (
     <div
-      className={cx('entry-row', selected && 'selected', entry.done && 'done')}
+      className={cx('entry-row', selected && 'selected', entry.done && !sub && 'done', sub && 'sub')}
       data-entry-id={entry.id}
       onClick={() => selectItem(sectionId, list, entry.id)}
     >
       {handle}
-      {type === 'workspace' && isChecklist ? (
+      {sub ? (
+        <span className="entry-icon">
+          <CornerDownRight size={13} />
+        </span>
+      ) : type === 'workspace' && isChecklist ? (
         <input
           type="checkbox"
           className="entry-check"
@@ -308,6 +323,32 @@ const EntryRow = memo(function EntryRow({
   )
 })
 
+/**
+ * Itens de primeiro nível e subitens de cada item. Um subitem cujo pai não está na lista (foi
+ * excluído, movido ou está em outra lista) ou que forma um ciclo aparece no primeiro nível.
+ */
+function entryTree(entries: Entry[]): { top: Entry[]; kids: Map<string, Entry[]> } {
+  const byId = new Map(entries.map((e) => [e.id, e]))
+  const nested = (e: Entry): boolean => {
+    const seen = new Set([e.id])
+    for (let p = e.parentId; p && byId.has(p); p = byId.get(p)!.parentId) {
+      if (seen.has(p)) return false
+      seen.add(p)
+    }
+    return !!e.parentId && byId.has(e.parentId)
+  }
+  const top: Entry[] = []
+  const kids = new Map<string, Entry[]>()
+  for (const e of entries) {
+    if (nested(e)) {
+      const list = kids.get(e.parentId!)
+      if (list) list.push(e)
+      else kids.set(e.parentId!, [e])
+    } else top.push(e)
+  }
+  return { top, kids }
+}
+
 function EntryGroup({
   type,
   boardId,
@@ -326,21 +367,20 @@ function EntryGroup({
   const templates = useStore((s) => s.data?.templates ?? NO_TEMPLATES)
 
   const entries = section[list]
-  // Fixados primeiro na tela; arrastar continua mexendo na ordem guardada (pelos ids).
-  const shown = pinnedFirst(entries)
-  const at = (i: number): number => entries.indexOf(shown[i])
+  const { top, kids } = entryTree(entries)
   const isChecklist = list === 'checklist'
 
-  return (
-    <div className="tree-group">
-      <div className="tree-group-label">
-        {LIST_LABELS[list]} <span>{entries.length}</span>
-      </div>
-      {entries.length > 0 && (
-        <SortableList
-          items={shown}
-          onMove={(from, to) => moveEntry(type, boardId, section.id, list, at(from), at(to))}
-          renderItem={(entry: Entry, handle) => (
+  /** Uma lista de irmãos (o primeiro nível ou os subitens de um item), cada um com os subitens dele. */
+  const renderList = (items: Entry[], sub = false): ReactNode => {
+    // Fixados primeiro na tela; arrastar continua mexendo na ordem guardada (pelos ids).
+    const shown = pinnedFirst(items)
+    const at = (i: number): number => entries.indexOf(shown[i])
+    return (
+      <SortableList
+        items={shown}
+        onMove={(from, to) => moveEntry(type, boardId, section.id, list, at(from), at(to))}
+        renderItem={(entry: Entry, handle) => (
+          <>
             <EntryRow
               type={type}
               boardId={boardId}
@@ -349,10 +389,21 @@ function EntryGroup({
               entry={entry}
               selected={entry.id === entryId}
               handle={handle}
+              sub={sub}
             />
-          )}
-        />
-      )}
+            {kids.has(entry.id) && <div className="entry-children">{renderList(kids.get(entry.id)!, true)}</div>}
+          </>
+        )}
+      />
+    )
+  }
+
+  return (
+    <div className="tree-group">
+      <div className="tree-group-label">
+        {LIST_LABELS[list]} <span>{top.length}</span>
+      </div>
+      {entries.length > 0 && renderList(top)}
       <div className="add-row">
         <QuickAdd
           placeholder={isChecklist ? '+ Adicionar item' : '+ Nova nota'}
@@ -415,7 +466,7 @@ function EntryDocument({
       crumbs={[board.title, section.title, LIST_LABELS[list]]}
       actions={
         <>
-          {type === 'workspace' && list === 'checklist' && (
+          {type === 'workspace' && list === 'checklist' && !entry.parentId && (
             <button
               type="button"
               className={cx('done-toggle', entry.done && 'on')}

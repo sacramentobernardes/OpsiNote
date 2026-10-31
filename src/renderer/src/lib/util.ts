@@ -1,4 +1,4 @@
-import type { Board, Kind, Section } from '../types'
+import type { Board, Entry, Kind, Section } from '../types'
 
 export function newId(): string {
   return crypto.randomUUID()
@@ -42,24 +42,44 @@ export function pinnedFirst<T extends { pinned?: boolean }>(list: T[]): T[] {
   return list.some((x) => x.pinned) ? [...list.filter((x) => x.pinned), ...list.filter((x) => !x.pinned)] : list
 }
 
+/** Subitens (`parentId`) ficam embaixo do item pai e não são tarefas: sem caixa de marcar e fora do progresso. */
+export const isTask = (e: Entry): boolean => !e.parentId
+
 export function progress(sections: Section[]): { done: number; total: number; percent: number } {
   let done = 0
   let total = 0
   for (const s of sections) {
-    total += s.checklist.length
-    done += s.checklist.filter((e) => e.done).length
+    const tasks = s.checklist.filter(isTask)
+    total += tasks.length
+    done += tasks.filter((e) => e.done).length
   }
   return { done, total, percent: total === 0 ? 0 : Math.round((done / total) * 100) }
 }
 
 /** Copia seções com ids novos e checklist zerado. */
 export function cloneSections(sections: Section[]): Section[] {
-  return sections.map((s) => ({
-    id: newId(),
-    title: s.title,
-    checklist: s.checklist.map((e) => ({ ...e, id: newId(), done: false })),
-    notes: s.notes.map((e) => ({ ...e, id: newId() }))
-  }))
+  return sections.map((s) => {
+    const ids = new Map<string, string>()
+    const copy = (e: Entry): Entry => {
+      const id = newId()
+      ids.set(e.id, id)
+      return { ...e, id }
+    }
+    const out = { id: newId(), title: s.title, checklist: s.checklist.map((e) => ({ ...copy(e), done: false })), notes: s.notes.map(copy) }
+    relinkParents(out, ids)
+    return out
+  })
+}
+
+/** Na cópia de uma seção, os subitens apontam para as cópias dos pais (`ids`: antigo → novo). */
+export function relinkParents(s: Section, ids: Map<string, string>): void {
+  for (const list of ['checklist', 'notes'] as const)
+    for (const e of s[list]) {
+      if (!e.parentId) continue
+      const p = ids.get(e.parentId)
+      if (p) e.parentId = p
+      else delete e.parentId
+    }
 }
 
 export function boardFromSections(title: string, kind: Kind, sections: Section[], color?: string): Board {

@@ -1,5 +1,22 @@
-import type { AppData, Board, BoardType, Entry, Kind, ListType, Section, SnippetGroup, TargetSheet, Template, Theme, TrashItem } from '../types'
-import { KINDS, newId } from './util'
+import type {
+  AppData,
+  Board,
+  BoardType,
+  Entry,
+  Kind,
+  ListType,
+  MindLayout,
+  MindMap,
+  MindNode,
+  MindShape,
+  Section,
+  SnippetGroup,
+  TargetSheet,
+  Template,
+  Theme,
+  TrashItem
+} from '../types'
+import { KINDS, newId, relinkParents } from './util'
 import { purgeExpired } from './trash'
 import { cleanOverrides } from './shortcuts'
 import { cleanAppearance } from './appearance'
@@ -29,12 +46,88 @@ type IdMode = 'fresh' | 'keep'
 /** Ids já usados durante um normalizeData: um id repetido (arquivo editado à mão) ganha um novo. */
 let seenIds: Set<string> | null = null
 
+/** Id antigo → id dado, dentro do espaço sendo lido (para o mapa mental achar as seções e itens). */
+let boardIds: Map<string, string> | null = null
+
 function idOf(v: Json, mode: IdMode): string {
+  let id: string
   if (mode === 'keep' && typeof v.id === 'string' && v.id && !seenIds?.has(v.id)) {
     seenIds?.add(v.id)
-    return v.id
+    id = v.id
+  } else id = newId()
+  if (typeof v.id === 'string' && v.id) boardIds?.set(v.id, id)
+  return id
+}
+
+/** Mapas mentais muito fundos ou enormes (arquivo editado à mão) são cortados. */
+const MIND_DEPTH = 64
+const MIND_NODES = 20_000
+
+function toMindMap(v: unknown, ids: Map<string, string>): MindMap | undefined {
+  if (!isObject(v) || !isObject(v.root)) return undefined
+  let budget = MIND_NODES
+  const node = (x: Json, depth: number): MindNode => {
+    budget--
+    const ref = isObject(x.ref) ? x.ref : null
+    const sectionId = ref && typeof ref.sectionId === 'string' ? ids.get(ref.sectionId) : undefined
+    const entryId = ref && typeof ref.entryId === 'string' ? ids.get(ref.entryId) : undefined
+    const list = ref && LISTS.includes(ref.list as ListType) ? (ref.list as ListType) : undefined
+    const linked = sectionId && (!ref?.entryId || (entryId && list))
+    const c = color(x.color)
+    return {
+      // Ids dos nós só precisam ser únicos dentro do mapa: ficam como estão.
+      id: str(x.id) || newId(),
+      text: str(x.text),
+      children:
+        depth < MIND_DEPTH
+          ? arr(x.children)
+              .filter(isObject)
+              .filter(() => budget > 0)
+              .map((ch) => node(ch, depth + 1))
+          : [],
+      ...(x.collapsed === true ? { collapsed: true } : {}),
+      ...(typeof x.note === 'string' && x.note ? { note: x.note } : {}),
+      ...(typeof x.url === 'string' && x.url ? { url: x.url } : {}),
+      ...(c ? { color: c } : {}),
+      ...(x.filled === true ? { filled: true } : {}),
+      ...(MIND_SHAPES.includes(x.shape as MindShape) ? { shape: x.shape as MindShape } : {}),
+      ...(x.bold === true ? { bold: true } : {}),
+      ...(x.big === true ? { big: true } : {}),
+      ...(linked ? { ref: { sectionId, ...(entryId ? { entryId, list } : {}) } } : {})
+    }
   }
-  return newId()
+  const root = node(v.root, 0)
+  // Ids repetidos quebrariam a seleção: os repetidos ganham um novo.
+  const seen = new Set<string>()
+  const fix = (n: MindNode): void => {
+    if (seen.has(n.id)) n.id = newId()
+    seen.add(n.id)
+    n.children.forEach(fix)
+  }
+  fix(root)
+  const width = num(v.lineWidth, 0)
+  const lineColor = color(v.lineColor)
+  // Posições arrastadas: só números de verdade e de nós que existem.
+  const moved: NonNullable<MindMap['moved']> = {}
+  if (isObject(v.moved)) {
+    for (const l of MIND_LAYOUTS) {
+      const byId = v.moved[l]
+      if (!isObject(byId)) continue
+      const out: Record<string, [number, number]> = {}
+      for (const [id, xy] of Object.entries(byId)) {
+        if (seen.has(id) && Array.isArray(xy) && xy.length === 2 && xy.every((n) => typeof n === 'number' && Number.isFinite(n) && Math.abs(n) < 1e6))
+          out[id] = [xy[0], xy[1]]
+      }
+      if (Object.keys(out).length) moved[l] = out
+    }
+  }
+  return {
+    root,
+    ...(Object.keys(moved).length ? { moved } : {}),
+    ...(MIND_LAYOUTS.includes(v.layout as MindLayout) ? { layout: v.layout as MindLayout } : {}),
+    ...(width >= 1 && width <= 6 ? { lineWidth: width } : {}),
+    ...(lineColor ? { lineColor } : {})
+  }
 }
 
 function toEntry(v: unknown, withDone: boolean, mode: IdMode = 'fresh'): Entry | null {
@@ -46,7 +139,9 @@ function toEntry(v: unknown, withDone: boolean, mode: IdMode = 'fresh'): Entry |
     content: str(v.content),
     ...(c ? { color: c } : {}),
     ...(withDone ? { done: v.done === true } : {}),
-    ...(v.pinned === true ? { pinned: true } : {})
+    ...(v.pinned === true ? { pinned: true } : {}),
+    // Ainda com o id do arquivo; toBoard troca pelo id dado ao pai (ou tira).
+    ...(typeof v.parentId === 'string' && v.parentId ? { parentId: v.parentId } : {})
   }
 }
 
@@ -96,9 +191,18 @@ function toSheet(v: unknown, mode: IdMode = 'fresh'): TargetSheet | undefined {
 function toBoard(v: unknown, defaultKind: Kind, mode: IdMode = 'fresh'): Board | null {
   if (!isObject(v)) return null
   // Formato novo usa "sections"; o formato do Swiftness usa "folders".
-  const sections = arr(v.sections ?? v.folders)
-    .map((s) => toSection(s, mode))
-    .filter((s): s is Section => s !== null)
+  const ids = new Map<string, string>()
+  boardIds = ids
+  let sections: Section[]
+  try {
+    sections = arr(v.sections ?? v.folders)
+      .map((s) => toSection(s, mode))
+      .filter((s): s is Section => s !== null)
+  } finally {
+    boardIds = null
+  }
+  for (const s of sections) relinkParents(s, ids)
+  const mindmap = toMindMap(v.mindmap, ids)
   const kind = KINDS.includes(v.kind as Kind) ? (v.kind as Kind) : defaultKind
   const now = Date.now()
   const sheet = toSheet(v.sheet, mode)
@@ -110,6 +214,7 @@ function toBoard(v: unknown, defaultKind: Kind, mode: IdMode = 'fresh'): Board |
     ...(c ? { color: c } : {}),
     sections,
     ...(sheet ? { sheet } : {}),
+    ...(mindmap ? { mindmap } : {}),
     ...(v.pinned === true ? { pinned: true } : {}),
     // Importado conta como novo; carregado mantém as datas.
     createdAt: mode === 'keep' ? num(v.createdAt, now) : now,
@@ -128,7 +233,8 @@ function toSnippetGroup(v: unknown, mode: IdMode = 'fresh'): SnippetGroup | null
   return {
     id: idOf(v, mode),
     title: str(v.title, 'Snippets'),
-    items: entries(v.items ?? v.data, false, mode),
+    // Snippets não têm subitens.
+    items: entries(v.items ?? v.data, false, mode).map(({ parentId: _parent, ...e }) => e),
     ...(v.collapsed === true ? { collapsed: true } : {})
   }
 }
@@ -167,6 +273,8 @@ export function parseImport(text: string): ImportResult {
 const BOARD_TYPES: BoardType[] = ['workspace', 'library']
 const LISTS: ListType[] = ['checklist', 'notes']
 const THEMES: Theme[] = ['system', 'light', 'dark']
+const MIND_LAYOUTS: MindLayout[] = ['map', 'right', 'down', 'radial']
+const MIND_SHAPES: MindShape[] = ['pill', 'rect', 'plain']
 
 /** Item da lixeira: só entra se tiver o que restaurar; o resto é completado. */
 function toTrashItem(v: unknown): TrashItem | null {

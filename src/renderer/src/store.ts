@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import type { AppData, Appearance, Board, BoardType, Entry, Kind, ListType, Section, ShortcutId, TargetSheet, Theme, View } from './types'
+import type { AppData, Appearance, Board, BoardType, Entry, Kind, ListType, MindMap, Section, ShortcutId, TargetSheet, Theme, View } from './types'
 import type { ImportResult } from './lib/importData'
 import { resolveBindings, setOverride, type Bindings } from './lib/shortcuts'
 import { createWelcomeBoard } from './lib/seed'
@@ -11,6 +11,7 @@ import { boardFromSections, cloneSections, newId } from './lib/util'
 import { createSheet, sheetSkeleton } from './lib/variables'
 import { SHEET_SPECS } from './lib/sheets'
 import * as ops from './lib/ops'
+import { copiedIds, copyMindMap, type Trashed } from './lib/mindmap'
 import type { EntryRef, SectionDest } from './lib/ops'
 import { deleteForever, moveToTrash, restoreFromTrash } from './lib/trash'
 
@@ -103,6 +104,14 @@ interface State {
   togglePin(target: PinTarget): void
   updateBoard(type: BoardType, id: string, patch: Partial<Pick<Board, 'title' | 'kind' | 'color'>>): void
   updateSheet(type: BoardType, id: string, patch: Partial<TargetSheet>): void
+  /** Salva o mapa mental do espaço; `undefined` volta ao mapa gerado das seções. */
+  setMindMap(type: BoardType, id: string, map: MindMap | undefined): void
+  /**
+   * Grava de uma vez o mapa mental e as seções que ele mudou (o mapa cria, renomeia, move e
+   * exclui itens do espaço). O que está em `trashed` vai para a lixeira; o que volta ao espaço
+   * (desfazer uma exclusão) sai da lixeira.
+   */
+  commitMindMap(type: BoardType, id: string, change: { map: MindMap | undefined; sections: Section[]; trashed?: Trashed[] }): void
   removeBoard(type: BoardType, id: string): void
   duplicateBoard(type: BoardType, id: string): void
   reorderBoards(type: BoardType, from: number, to: number): void
@@ -115,8 +124,20 @@ interface State {
   moveSectionTo(from: { boardType: BoardType; boardId: string; sectionId: string }, to: { boardType: BoardType; boardId: string }): void
   setSectionCollapsed(type: BoardType, boardId: string, sectionId: string, collapsed: boolean): void
 
-  /** `open: false` só acrescenta, sem abrir o item (para adicionar vários em sequência). */
-  addEntry(type: BoardType, boardId: string, sectionId: string, list: ListType, title: string, content?: string, open?: boolean): void
+  /**
+   * `open: false` só acrescenta, sem abrir o item (para adicionar vários em sequência).
+   * Com `parentId`, vira subitem dessa entrada, logo depois dos outros subitens dela.
+   */
+  addEntry(
+    type: BoardType,
+    boardId: string,
+    sectionId: string,
+    list: ListType,
+    title: string,
+    content?: string,
+    open?: boolean,
+    parentId?: string
+  ): void
   updateEntry(
     type: BoardType,
     boardId: string,
@@ -392,6 +413,7 @@ export const useStore = create<State>()(
           : boardFromSections(type === 'workspace' ? 'Novo espaço' : 'Nova biblioteca', kind, [newSection('Geral')])
         const sheet = library ? sheetSkeleton(library.sheet) : undefined
         if (sheet) board.sheet = sheet
+        if (library?.mindmap) board.mindmap = copyMindMap(library.mindmap, copiedIds(library.sections, board.sections))
         set((st) => {
           if (!st.data) return
           ops.boardsOf(st.data, type).unshift(board)
@@ -427,6 +449,7 @@ export const useStore = create<State>()(
         const lib = boardFromSections(ws.title, ws.kind, cloneSections(ws.sections), ws.color)
         const sheet = sheetSkeleton(ws.sheet)
         if (sheet) lib.sheet = sheet
+        if (ws.mindmap) lib.mindmap = copyMindMap(ws.mindmap, copiedIds(ws.sections, lib.sections))
         set((s) => {
           s.data?.libraries.unshift(lib)
         })
@@ -445,6 +468,39 @@ export const useStore = create<State>()(
           if (!board) return
           board.sheet = { ...(board.sheet ?? createSheet(SHEET_SPECS[board.kind].defaultKeys)), ...patch }
           board.updatedAt = Date.now()
+        }),
+
+      setMindMap: (type, id, map) =>
+        set((s) => {
+          const board = findBoard(s.data, type, id)
+          if (!board) return
+          if (map) board.mindmap = map
+          else delete board.mindmap
+          board.updatedAt = Date.now()
+        }),
+
+      commitMindMap: (type, id, change) =>
+        set((s) => {
+          const board = findBoard(s.data, type, id)
+          if (!s.data || !board) return
+          for (const t of change.trashed ?? []) moveToTrash(s.data, { ...t, boardType: type, boardId: id })
+          board.sections = change.sections
+          if (change.map) board.mindmap = change.map
+          else delete board.mindmap
+          board.updatedAt = Date.now()
+          // Desfazer uma exclusão traz a seção ou o item de volta: o registro na lixeira sobra.
+          const ids = new Set<string>()
+          for (const sec of board.sections) {
+            ids.add(sec.id)
+            for (const e of [...sec.checklist, ...sec.notes]) ids.add(e.id)
+          }
+          s.data.trash = s.data.trash.filter(
+            (t) =>
+              !(
+                (t.kind === 'section' && t.boardId === id && ids.has(t.section.id)) ||
+                (t.kind === 'entry' && t.boardId === id && ids.has(t.entry.id))
+              )
+          )
         }),
 
       removeBoard: (type, id) =>
@@ -537,12 +593,24 @@ export const useStore = create<State>()(
 
       /* ---------- Entradas ---------- */
 
-      addEntry: (type, boardId, sectionId, list, title, content = '', open = true) =>
+      addEntry: (type, boardId, sectionId, list, title, content = '', open = true, parentId) =>
         set((s) => {
           const section = editSection(s.data, type, boardId, sectionId)
           if (!section) return
-          const entry: Entry = { id: newId(), title, content, ...(list === 'checklist' ? { done: false } : {}) }
-          section[list].push(entry)
+          // Subitem não é tarefa: sem "concluído".
+          const entry: Entry = { id: newId(), title, content, ...(parentId ? { parentId } : list === 'checklist' ? { done: false } : {}) }
+          const items = section[list]
+          // Subitem: depois do pai e dos subitens que ele já tem.
+          let at = items.length
+          if (parentId) {
+            const inside = new Set([parentId])
+            const from = items.findIndex((e) => e.id === parentId)
+            if (from >= 0) {
+              at = from + 1
+              while (at < items.length && items[at].parentId && inside.has(items[at].parentId!)) inside.add(items[at++].id)
+            }
+          }
+          items.splice(at, 0, entry)
           if (!open) return
           s.sectionId = sectionId
           s.list = list
@@ -556,10 +624,16 @@ export const useStore = create<State>()(
           if (entry) Object.assign(entry, patch)
         }),
 
-      removeEntry: (type, boardId, sectionId, list, entryId) =>
+      removeEntry: (type, boardId, sectionId, list, entryId) => {
+        const parentId = findBoard(get().data, type, boardId)
+          ?.sections.find((x) => x.id === sectionId)
+          ?.[list].find((e) => e.id === entryId)?.parentId
         trash({ kind: 'entry', boardType: type, boardId, sectionId, list, entryId }, list === 'checklist' ? 'O item' : 'A nota', (s) => {
           if (s.entryId === entryId) s.entryId = null
-        }),
+          const section = findBoard(s.data, type, boardId)?.sections.find((x) => x.id === sectionId)
+          if (section) ops.liftChildren(section, entryId, parentId)
+        })
+      },
 
       moveEntry: (type, boardId, sectionId, list, from, to) =>
         set((s) => {

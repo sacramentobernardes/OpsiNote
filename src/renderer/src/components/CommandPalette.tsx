@@ -21,7 +21,7 @@ import {
   Trash2,
   Timer,
   Upload,
-  Waypoints
+  Network
 } from 'lucide-react'
 import { useBindings, useStore } from '../store'
 import type { ShortcutId, Theme } from '../types'
@@ -118,7 +118,7 @@ export function CommandPalette(): ReactNode {
     { id: 'timer50', label: 'Iniciar foco de 50 minutos', icon: <Timer size={15} />, run: () => startTimer(50, 'focus') },
     { id: 'break5', label: 'Iniciar pausa de 5 minutos', icon: <Timer size={15} />, run: () => startTimer(5, 'break') },
     { id: 'timerStop', label: 'Parar o temporizador', icon: <Timer size={15} />, run: stopTimer },
-    { id: 'graph', label: 'Ir para o Grafo', icon: <Waypoints size={15} />, run: () => open({ type: 'graph' }) },
+    { id: 'mindmap', label: 'Ir para o Mapa mental', icon: <Network size={15} />, run: () => open({ type: 'mindmap' }) },
     { id: 'trash', label: 'Abrir a lixeira', icon: <Trash2 size={15} />, run: () => open({ type: 'trash' }) },
     { id: 'focus', label: 'Modo foco', icon: <Maximize2 size={15} />, shortcut: 'focus', run: () => toggleFocus() },
     { id: 'rail', label: 'Expandir ou recolher o menu', icon: <PanelLeft size={15} />, shortcut: 'toggleRail', run: toggleRail },

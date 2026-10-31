@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useStore } from './store'
 import { createSeedData } from './lib/seed'
-import { GraphView } from './components/GraphView'
+import { MindMapView } from './components/MindMapView'
 import { FocusTimerPill, useFocusTimerWatcher } from './components/FocusTimer'
 import { textOn } from './lib/appearance'
 import { normalizeData } from './lib/importData'
@@ -218,8 +218,8 @@ export function App(): ReactNode {
     case 'library':
       main = <BoardView />
       break
-    case 'graph':
-      main = <GraphView />
+    case 'mindmap':
+      main = <MindMapView />
       break
     case 'libraries':
       main = <LibrariesView />
@@ -240,8 +240,8 @@ export function App(): ReactNode {
       main = <HomeView />
   }
 
-  // Início, Bibliotecas, Lixeira, Grafo e Configurações ocupam a área toda; as demais visões têm painel + documento.
-  const noPanel = view.type === 'home' || view.type === 'libraries' || view.type === 'trash' || view.type === 'settings' || view.type === 'graph'
+  // Início, Bibliotecas, Lixeira, Mapa mental e Configurações ocupam a área toda; as demais visões têm painel + documento.
+  const noPanel = view.type === 'home' || view.type === 'libraries' || view.type === 'trash' || view.type === 'settings' || view.type === 'mindmap'
 
   // Larguras escolhidas arrastando as bordas; sem elas, valem os padrões do CSS.
   const sizes = {

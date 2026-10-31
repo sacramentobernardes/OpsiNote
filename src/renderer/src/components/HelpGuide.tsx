@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import {
   ArrowRight,
   Sparkles,
-  Waypoints,
+  Network,
   BookCopy,
   ClipboardList,
   Database,
@@ -453,9 +453,9 @@ user       = svc_backup`}</Code>
     )
   },
   {
-    id: 'fixados-grafo',
-    title: 'Fixados, grafo, temporizador e aparência',
-    icon: <Waypoints size={16} />,
+    id: 'fixados-mapa',
+    title: 'Fixados, mapa mental, temporizador e aparência',
+    icon: <Network size={16} />,
     body: (
       <>
         <ul>
@@ -465,22 +465,29 @@ user       = svc_backup`}</Code>
             busca, antes de digitar).
           </li>
           <li>
-            <strong>Grafo</strong> (ícone no trilho): mostra os espaços, tarefas e notas e como se ligam. Um texto se liga a outro
-            quando cita o título dele, solto ou como <code>[[Título]]</code>. Clique num nó para abrir, arraste para mover, role
-            para dar zoom. O painel ao lado lista os <strong>mais conectados</strong> e as tarefas e notas{' '}
-            <strong>sem nenhuma conexão</strong>.
+            <strong>Mapa mental</strong> (ícone no trilho, ou <strong>Ver mapa mental</strong> no menu de um espaço): cada espaço e
+            biblioteca tem o seu, e ele anda junto com o espaço. Um tópico novo embaixo do centro vira uma seção; embaixo de uma
+            seção, uma tarefa; embaixo de uma tarefa, um subitem dela, que aparece recuado na árvore do espaço.
             <ul>
               <li>
-                <strong>Ligar pelo grafo</strong>: <Keys keys={['Shift']} /> + arraste de uma nota ou tarefa até outro nó. A nota
-                ganha <code>[[Título]]</code> no texto (o aviso tem Desfazer).
+                <strong>Editar</strong>: duplo clique (ou <Keys keys={['F2']} />) muda o texto; <Keys keys={['Tab']} /> cria um filho,{' '}
+                <Keys keys={['Enter']} /> cria um irmão, <Keys keys={['Delete']} /> exclui (os itens vão para a lixeira),{' '}
+                <Keys keys={['Espaço']} /> recolhe ou expande e as setas navegam. <Keys keys={['Ctrl', 'Z']} /> desfaz. As tarefas têm a
+                caixa de marcar no próprio balão.
               </li>
               <li>
-                <strong>Botão direito num nó</strong>: abrir, ver só a vizinhança (1 a 3 passos), ligar a outro nó, copiar{' '}
-                <code>[[Título]]</code> e fixar no topo.
+                <strong>Arraste</strong> um tópico para o vazio para deixá-lo ali (o ramo vai junto), ou solte-o sobre outro para mudá-lo
+                de ramo. Arraste o fundo para mover a vista e role para dar zoom.
               </li>
               <li>
-                Também dá para colorir por espaço, tipo ou categoria, ocultar as tarefas concluídas e salvar o grafo como imagem
-                (PNG). Filtros e cores ficam lembrados.
+                <strong>Painel ao lado</strong>: numa tarefa ou nota, a aba <strong>Documento</strong> abre o editor da nota, como na
+                árvore do espaço. A aba <strong>Tópico</strong> guarda um link, uma nota só do mapa, a cor, o formato do balão, negrito e
+                texto grande.
+              </li>
+              <li>
+                Na barra: busca no mapa, arranjo <strong>Mapa</strong> (dois lados), <strong>Horizontal</strong>, <strong>Vertical</strong>{' '}
+                ou <strong>Radial</strong>; espessura e cor das linhas; recolher ou expandir tudo; <strong>Reorganizar</strong> (volta os
+                tópicos arrastados); tema claro ou escuro; e salvar como imagem (PNG).
               </li>
             </ul>
           </li>
@@ -494,13 +501,14 @@ user       = svc_backup`}</Code>
             itens), o jeito dos cartões e os cantos.
           </li>
         </ul>
-        <Example title="Ligando o pentest ao relatório">
+        <Example title="Roteiro de ataque">
           <p>
-            Numa nota do espaço <em>Projeto Atlas</em>, escreva <code>Ver [[Portas abertas]]</code>. No grafo, a nota passa a ter
-            uma linha até a nota <em>Portas abertas</em> do pentest, e as duas saem da lista de sem conexões.
+            No mapa do espaço <em>TecInv</em>, escolha a seção <em>Recon</em> e aperte <Keys keys={['Tab']} />: digite{' '}
+            <code>subfinder -d alvo.com | httpx -silent</code> e <Keys keys={['Enter']} />. No painel, cole a explicação de cada
+            ferramenta na nota e o repositório no link; o tópico ganha os ícones de nota e de link.
           </p>
         </Example>
-        <Go view={{ type: 'graph' }}>Abrir o grafo</Go>
+        <Go view={{ type: 'mindmap' }}>Abrir o mapa mental</Go>
       </>
     )
   },

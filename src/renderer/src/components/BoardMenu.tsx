@@ -1,4 +1,4 @@
-import { BookCopy, Copy, ExternalLink, Layers, Pencil, Pin, PinOff, Trash, Upload } from 'lucide-react'
+import { BookCopy, Copy, ExternalLink, Layers, Network, Pencil, Pin, PinOff, Trash, Upload } from 'lucide-react'
 import { useStore } from '../store'
 import type { Board, BoardType, Kind } from '../types'
 import { COLORS, KINDS, KIND_LABELS } from '../lib/util'
@@ -70,6 +70,7 @@ export function useBoardMenu(): (type: BoardType, board: Board, options?: { inHe
         onPick: (id) => updateBoard(type, board.id, { kind: id as Kind })
       },
       { type: 'separator' },
+      { label: 'Ver mapa mental', icon: <Network size={14} />, onSelect: () => open({ type: 'mindmap', board: { type, id: board.id } }) },
       board.pinned
         ? { label: 'Desafixar', icon: <PinOff size={14} />, onSelect: () => togglePin({ kind: 'board', type, id: board.id }) }
         : { label: 'Fixar no topo', icon: <Pin size={14} />, onSelect: () => togglePin({ kind: 'board', type, id: board.id }) },

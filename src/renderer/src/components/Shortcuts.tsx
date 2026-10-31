@@ -269,7 +269,7 @@ function step(delta: number): void {
 
 /** Ações sobre o que está aberto no documento. */
 function current(): {
-  entry?: { type: 'workspace' | 'library'; boardId: string; sectionId: string; list: ListType; done?: boolean }
+  entry?: { type: 'workspace' | 'library'; boardId: string; sectionId: string; list: ListType; done?: boolean; sub?: boolean }
   snippet?: { groupId: string; content: string }
   templateId?: string
 } {
@@ -280,7 +280,7 @@ function current(): {
     const board = (v.type === 'workspace' ? s.data.workspaces : s.data.libraries).find((b) => b.id === v.id)
     const section = board?.sections.find((x) => x.id === s.sectionId)
     const entry = section?.[s.list].find((e) => e.id === s.entryId)
-    return entry && section ? { entry: { type: v.type, boardId: v.id, sectionId: section.id, list: s.list, done: entry.done } } : {}
+    return entry && section ? { entry: { type: v.type, boardId: v.id, sectionId: section.id, list: s.list, done: entry.done, sub: !!entry.parentId } } : {}
   }
   if (v.type === 'snippets') {
     const group = s.data.snippetGroups.find((g) => g.items.some((i) => i.id === s.entryId))
@@ -358,9 +358,9 @@ export function useShortcuts(): void {
           step(action === 'nextItem' ? 1 : -1)
           break
         case 'toggleDone': {
-          // Fora de um item de checklist, a tecla segue para o editor.
+          // Fora de um item de checklist (subitens não são tarefas), a tecla segue para o editor.
           const c = current()
-          if (c.entry && c.entry.type === 'workspace' && c.entry.list === 'checklist') {
+          if (c.entry && c.entry.type === 'workspace' && c.entry.list === 'checklist' && !c.entry.sub) {
             handled()
             s.updateEntry('workspace', c.entry.boardId, c.entry.sectionId, 'checklist', s.entryId!, { done: !c.entry.done })
           }
